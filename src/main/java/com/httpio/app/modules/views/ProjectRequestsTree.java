@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.httpio.app.models.Project;
 import com.httpio.app.models.Request;
 import com.httpio.app.modules.controls.RequestLabel;
+import com.httpio.app.services.Icons;
 import com.httpio.app.services.ProjectSupervisor;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -26,6 +27,7 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
     private Project project;
 
     private ProjectSupervisor projectSupervisor;
+    private Icons icons;
 
     /**
      * Listeners
@@ -132,6 +134,8 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
             }
         });
 
+        icons.attachIcon(itemAddRequest, Icons.ICON_ADD);
+
         MenuItem itemRename = new MenuItem("Rename");
 
         itemRename.setOnAction(new EventHandler<ActionEvent>() {
@@ -141,6 +145,8 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
             }
         });
 
+        icons.attachIcon(itemRename, Icons.ICON_RENAME);
+
         MenuItem itemDelete = new MenuItem("Delete");
 
         itemDelete.setOnAction(new EventHandler<ActionEvent>() {
@@ -149,6 +155,8 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
                 showDeleteDialog(cell.getTreeItem());
             }
         });
+
+        icons.attachIcon(itemDelete, Icons.ICON_REMOVE);
 
         ContextMenu contextMenu = new ContextMenu();
 
@@ -168,6 +176,11 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
     @Inject
     public void setProjectSupervisor(ProjectSupervisor projectSupervisor) {
         this.projectSupervisor = projectSupervisor;
+    }
+
+    @Inject
+    public void setIcons(Icons icons) {
+        this.icons = icons;
     }
 
     /**

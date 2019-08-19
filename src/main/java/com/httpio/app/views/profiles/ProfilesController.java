@@ -9,6 +9,7 @@ import com.httpio.app.modules.ListenersContainer;
 import com.httpio.app.modules.views.TableViewNameValue;
 import com.httpio.app.services.Http;
 import com.httpio.app.services.Http.Protocol;
+import com.httpio.app.services.Icons;
 import com.httpio.app.services.ProjectSupervisor;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -24,6 +25,7 @@ public class ProfilesController implements ControllerInterface {
     private Project project;
     private Profile profile;
     private Http http;
+    private Icons icons;
     private ListenersContainer listenersContainer = new ListenersContainer();
     private ProjectSupervisor projectSupervisor;
 
@@ -69,6 +71,11 @@ public class ProfilesController implements ControllerInterface {
     @Inject
     public void setHttp(Http http) {
         this.http = http;
+    }
+
+    @Inject
+    public void setIcons(Icons icons) {
+        this.icons = icons;
     }
 
     public SplitPane getSplitPane() {
@@ -133,16 +140,21 @@ public class ProfilesController implements ControllerInterface {
     }
 
     private void attachContextMenuToProfileListView(ListCell<Profile> cell, Profile profile) {
+        // Rename
         MenuItem itemRename = new MenuItem("Rename");
+        icons.attachIcon(itemRename, Icons.ICON_RENAME);
 
+        // Delete
+        MenuItem itemDelete = new MenuItem("Delete");
+        icons.attachIcon(itemDelete, Icons.ICON_REMOVE);
+
+        // Events
         itemRename.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 showRenameDialog(profile);
             }
         });
-
-        MenuItem itemDelete = new MenuItem("Delete");
 
         itemDelete.setOnAction(new EventHandler<ActionEvent>() {
             @Override

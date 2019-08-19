@@ -3,6 +3,7 @@ package com.httpio.app.views.layout;
 import com.google.inject.Inject;
 import com.httpio.app.App;
 import com.httpio.app.models.Project;
+import com.httpio.app.services.Icons;
 import com.httpio.app.services.ProjectSupervisor;
 import com.httpio.app.modules.ControllerInterface;
 import com.httpio.app.views.profiles.ProfilesView;
@@ -68,10 +69,16 @@ public class LayoutController implements ControllerInterface {
     private Stage stage;
     private App app;
     private ProjectSupervisor projectSupervisor;
+    private Icons icons;
 
     @Inject
     public void setProjectSupervisor(ProjectSupervisor projectSupervisor) {
         this.projectSupervisor = projectSupervisor;
+    }
+
+    @Inject
+    public void setIcons(Icons icons) {
+        this.icons = icons;
     }
 
     @Inject
@@ -124,19 +131,33 @@ public class LayoutController implements ControllerInterface {
         // Menu file
         Menu menu = new Menu("File");
 
+        //File new
         MenuItem menuItemFileNew = new MenuItem("New");
+        icons.attachIcon(menuItemFileNew, Icons.ICON_NEW_FILE);
 
+        // File open
+        MenuItem menuItemFileOpen = new MenuItem("Open");
+        icons.attachIcon(menuItemFileOpen, Icons.ICON_OPEN);
+
+        // File save
+        menuItemFileSave = new MenuItem("Save");
+        icons.attachIcon(menuItemFileSave, Icons.ICON_SAVE);
+
+        // File save as
+        MenuItem menuItemFileSaveAs = new MenuItem("Save as");
+        icons.attachIcon(menuItemFileSaveAs, Icons.ICON_SAVE_AS);
+
+        // File close
+        MenuItem menuItemFileClose = new MenuItem("Close");
+        icons.attachIcon(menuItemFileClose, Icons.ICON_CLOSE);
+
+        // Events
         menuItemFileNew.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 projectSupervisor.loadNewProject();
             }
         });
-
-        MenuItem menuItemFileOpen = new MenuItem("Open");
-        menuItemFileSave = new MenuItem("Save");
-        MenuItem menuItemFileSaveAs = new MenuItem("Save as");
-        MenuItem menuItemFileClose = new MenuItem("Close");
 
         menuItemFileClose.setOnAction(new EventHandler<ActionEvent>() {
             @Override

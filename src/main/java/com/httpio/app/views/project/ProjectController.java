@@ -30,6 +30,7 @@ public class ProjectController implements ControllerInterface {
     private Request request;
     private Profile profile;
     private Http http;
+    private Icons icons;
     private Logger logger;
     private ProjectSupervisor projectSupervisor;
 
@@ -122,6 +123,11 @@ public class ProjectController implements ControllerInterface {
     }
 
     @Inject
+    public void setIcons(Icons icons) {
+        this.icons = icons;
+    }
+
+    @Inject
     public void setHttpSender(HTTPSender httpSender) {
         this.httpSender = httpSender;
     }
@@ -152,6 +158,7 @@ public class ProjectController implements ControllerInterface {
         requestMethod.setItems(http.getMethods());
 
         requestsTree.setProjectSupervisor(projectSupervisor);
+        requestsTree.setIcons(icons);
 
         prepareRequestProfileComboBox();
         prepareRequestHeadersTableView();

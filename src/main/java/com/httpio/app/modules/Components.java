@@ -5,6 +5,7 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.httpio.app.App;
 import com.httpio.app.services.Http;
+import com.httpio.app.services.Icons;
 import com.httpio.app.services.Logger;
 import com.httpio.app.services.ProjectSupervisor;
 import javafx.scene.Scene;
@@ -32,6 +33,7 @@ public class Components extends AbstractModule {
         bind(ProjectSupervisor.class).in(Singleton.class);
         bind(Logger.class).in(Singleton.class);
         bind(Http.class).in(Singleton.class);
+        bind(Icons.class).in(Singleton.class);
     }
 
     @Provides
