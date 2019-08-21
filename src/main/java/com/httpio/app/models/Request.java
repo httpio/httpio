@@ -12,10 +12,12 @@ public class Request {
     private SimpleStringProperty id = new SimpleStringProperty();
     private SimpleObjectProperty<Method> method = new SimpleObjectProperty<>();
     private SimpleStringProperty resource = new SimpleStringProperty();
+    private SimpleStringProperty url = new SimpleStringProperty();
 
     private SimpleStringProperty name = new SimpleStringProperty();
     private SimpleStringProperty body = new SimpleStringProperty();
     private SimpleBooleanProperty inheritResource = new SimpleBooleanProperty(true);
+    private SimpleBooleanProperty standalone = new SimpleBooleanProperty(false);
 
     private Request parent;
 
@@ -35,30 +37,60 @@ public class Request {
     private ListProperty<Request> requests = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     /**
-     * Default constructor.
+     * Constructor.
      */
     public Request() {
         this.id.setValue(UUID.randomUUID().toString());
     }
 
-    /**
-     * Init request only with ID.
-     *
-     * @param id
-     */
     public Request(String id) {
         this.id.setValue(id);
     }
 
-    /**
-     * Init request with ID and Name.
-     *
-     * @param id
-     * @param name
-     */
     public Request(String id, String name) {
         this.id.setValue(id);
         this.name.setValue(name);
+    }
+
+    /**
+     * Standalone
+     */
+    public boolean isStandalone() {
+        return standalone.get();
+    }
+
+    public SimpleBooleanProperty standaloneProperty() {
+        return standalone;
+    }
+
+    public void setStandalone(boolean standalone) {
+        this.standalone.set(standalone);
+    }
+
+    /**
+     * URL
+     */
+    public String getUrl() {
+        return url.get();
+    }
+
+    public String getURLFull() {
+        String t = url.getValue() == null ? "" : url.getValue();
+        String p = parent == null ? "" : parent.getURLFull();
+
+        if (!standalone.getValue()) {
+            return p + t;
+        } else {
+            return t;
+        }
+    }
+
+    public SimpleStringProperty urlProperty() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url.set(url);
     }
 
     /**
@@ -187,17 +219,6 @@ public class Request {
         return resource.getValue();
     }
 
-    public String getResourceFull() {
-        String t = resource == null ? "" : resource.getValue();
-        String p = parent == null ? "" : parent.getResourceFull();
-
-        if (inheritResource.getValue()) {
-            return p + t;
-        } else {
-            return t;
-        }
-    }
-
     public void setResource(String resource) {
         this.resource.setValue(resource);
     }
@@ -225,6 +246,21 @@ public class Request {
      */
     public void addHeader(Item header) {
         headers.add(header);
+    }
+
+    public void addHeader(String name, String value) {
+        Item item = new Item();
+        item.setName(name);
+        item.setValue(value);
+
+        headers.add(item);
+    }
+
+    public void addHeader(String name) {
+        Item item = new Item();
+        item.setName(name);
+
+        headers.add(item);
     }
 
     /**
@@ -346,6 +382,23 @@ public class Request {
      */
     public void addParameter(Item parameter) {
         this.parameters.add(parameter);
+    }
+
+    public void addParameter(String name, String value) {
+        Item item = new Item();
+
+        item.setName(name);
+        item.setValue(value);
+
+        this.parameters.add(item);
+    }
+
+    public void addParameter(String name) {
+        Item item = new Item();
+
+        item.setName(name);
+
+        this.parameters.add(item);
     }
 
     /**

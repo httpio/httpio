@@ -1,6 +1,7 @@
 package com.httpio.app.views.project;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.httpio.app.services.*;
 import com.httpio.app.services.Http.Method;
 import com.httpio.app.models.Profile;
@@ -19,6 +20,8 @@ import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 
+import java.net.MalformedURLException;
+
 /**
  * Controller for project view.
  */
@@ -26,6 +29,7 @@ public class ProjectController implements ControllerInterface {
     private final String SCOPE_REQUEST = "request";
     private final String SCOPE_PROFILE = "profile";
 
+    private Injector injector;
     private Project project;
     private Request request;
     private Profile profile;
@@ -33,6 +37,8 @@ public class ProjectController implements ControllerInterface {
     private Icons icons;
     private Logger logger;
     private ProjectSupervisor projectSupervisor;
+    private Windows windows;
+    private RequestsCreator requestsCreator;
 
     /**
      * Listeners container
@@ -42,7 +48,7 @@ public class ProjectController implements ControllerInterface {
     /**
      * Request preparator
      */
-    private RequestPreparator requestPreparator;
+    private HTTPRequestPreparator httpRequestPreparator;
 
     /**
      * HTTP sender.
@@ -80,7 +86,7 @@ public class ProjectController implements ControllerInterface {
     private ProjectRequestsTree requestsTree;
 
     @FXML
-    private TextField requestResourceTextField;
+    private TextField urlField;
 
     @FXML
     private ComboBox<Method> requestMethod;
@@ -113,8 +119,8 @@ public class ProjectController implements ControllerInterface {
     private SplitPane splitPane;
 
     @Inject
-    public void setRequestPreparator(RequestPreparator requestPreparator) {
-        this.requestPreparator = requestPreparator;
+    public void setHttpRequestPreparator(HTTPRequestPreparator httpRequestPreparator) {
+        this.httpRequestPreparator = httpRequestPreparator;
     }
 
     @Inject
@@ -123,13 +129,28 @@ public class ProjectController implements ControllerInterface {
     }
 
     @Inject
+    public void setRequestsCreator(RequestsCreator requestsCreator) {
+        this.requestsCreator = requestsCreator;
+    }
+
+    @Inject
     public void setIcons(Icons icons) {
         this.icons = icons;
     }
 
     @Inject
+    public void setWindows(Windows windows) {
+        this.windows = windows;
+    }
+
+    @Inject
     public void setHttpSender(HTTPSender httpSender) {
         this.httpSender = httpSender;
+    }
+
+    @Inject
+    public void setInjector(Injector injector) {
+        this.injector = injector;
     }
 
     @Inject
@@ -159,6 +180,9 @@ public class ProjectController implements ControllerInterface {
 
         requestsTree.setProjectSupervisor(projectSupervisor);
         requestsTree.setIcons(icons);
+        requestsTree.setInjector(injector);
+        requestsTree.setWindows(windows);
+        requestsTree.setRequestsCreator(requestsCreator);
 
         prepareRequestProfileComboBox();
         prepareRequestHeadersTableView();
@@ -204,6 +228,8 @@ public class ProjectController implements ControllerInterface {
     }
 
     private void prepareRequestHeadersTableView() {
+        requestHeadersTableView.setIcons(icons);
+
         requestHeadersTableView.setItemFactory(new Callback<String, Item>() {
             @Override
             public Item call(String s) {
@@ -230,6 +256,8 @@ public class ProjectController implements ControllerInterface {
     }
 
     private void prepareRequestParametersTableView() {
+        requestParametersTableView.setIcons(icons);
+
         requestParametersTableView.setItemFactory(new Callback<String, Item>() {
             @Override
             public Item call(String s) {
@@ -302,11 +330,7 @@ public class ProjectController implements ControllerInterface {
 
         listenersContainer.attach(profile.idProperty(), onAnyChange, SCOPE_PROFILE);
         listenersContainer.attach(profile.nameProperty(), onAnyChange, SCOPE_PROFILE);
-        listenersContainer.attach(profile.protocolProperty(), onAnyChange, SCOPE_PROFILE);
-        listenersContainer.attach(profile.usernameProperty(), onAnyChange, SCOPE_PROFILE);
-        listenersContainer.attach(profile.passwordProperty(), onAnyChange, SCOPE_PROFILE);
-        listenersContainer.attach(profile.hostProperty(), onAnyChange, SCOPE_PROFILE);
-        listenersContainer.attach(profile.portProperty(), onAnyChange, SCOPE_PROFILE);
+        listenersContainer.attach(profile.baseURLProperty(), onAnyChange, SCOPE_PROFILE);
         listenersContainer.attach(profile.descriptionProperty(), onAnyChange, SCOPE_PROFILE);
 
         listenersContainer.attachToItemsList(profile.variablesProperty(), onAnyChange, SCOPE_PROFILE);
@@ -323,18 +347,11 @@ public class ProjectController implements ControllerInterface {
      */
     private void loadRequest(Request request) {
         if (this.request != null) {
-            // Unbind previous value
-            // requestMethod.valueProperty().unbindBidirectional(request.methodProperty());
-            // requestResourceTextField.textProperty().unbindBidirectional(request.resourceProperty());
-
-            // requestHeadersTableView.getTableView().itemsProperty().unbind();
-            // requestParametersTableView.getTableView().itemsProperty().unbind();
-
             // Request method
             requestMethod.valueProperty().unbindBidirectional(this.request.methodProperty());
 
             // Request resource
-            requestResourceTextField.textProperty().unbindBidirectional(this.request.resourceProperty());
+            urlField.textProperty().unbindBidirectional(this.request.urlProperty());
 
             // Header
             requestHeadersTableView.getTableView().itemsProperty().unbindBidirectional(this.request.headersProperty());
@@ -357,8 +374,8 @@ public class ProjectController implements ControllerInterface {
         // Request method
         requestMethod.valueProperty().bindBidirectional(request.methodProperty());
 
-        // Request resource
-        requestResourceTextField.textProperty().bindBidirectional(request.resourceProperty());
+        // URL
+        urlField.textProperty().bindBidirectional(request.urlProperty());
 
         // Header
         requestHeadersTableView.getTableView().itemsProperty().bindBidirectional(request.headersProperty());
@@ -370,7 +387,7 @@ public class ProjectController implements ControllerInterface {
 
         // Attached to changes
         listenersContainer.attach(request.methodProperty(), onAnyChange);
-        listenersContainer.attach(request.resourceProperty(), onAnyChange);
+        listenersContainer.attach(request.urlProperty(), onAnyChange);
         listenersContainer.attach(request.headersProperty(), onAnyChange);
         listenersContainer.attach(request.parametersProperty(), onAnyChange);
         listenersContainer.attach(request.bodyProperty(), onAnyChange);
@@ -395,7 +412,11 @@ public class ProjectController implements ControllerInterface {
         if (profile == null || request == null) {
             requestRawTextArea.setText("");
         } else {
-            requestRawTextArea.setText(requestPreparator.prepare(request, profile).toRaw());
+            try {
+                requestRawTextArea.setText(httpRequestPreparator.prepare(request, profile).toRaw());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

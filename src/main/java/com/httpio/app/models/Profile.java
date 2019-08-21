@@ -1,7 +1,6 @@
 package com.httpio.app.models;
 
 import com.httpio.app.modules.Item;
-import com.httpio.app.services.Http.Protocol;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,12 +9,8 @@ import java.util.UUID;
 public class Profile {
     private StringProperty id = new SimpleStringProperty();
     private StringProperty name = new SimpleStringProperty();
-    private ObjectProperty<Protocol> protocol = new SimpleObjectProperty<>();
-    private StringProperty username = new SimpleStringProperty();
-    private StringProperty password = new SimpleStringProperty();
-    private StringProperty host = new SimpleStringProperty();
-    private StringProperty port = new SimpleStringProperty();
     private StringProperty description = new SimpleStringProperty();
+    private StringProperty baseURL = new SimpleStringProperty();
 
     private ListProperty<Item> variables = new SimpleListProperty<>(FXCollections.observableArrayList());
     private ListProperty<Item> headers = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -43,9 +38,7 @@ public class Profile {
     }
 
     /**
-     * Returns ID.
-     *
-     * @return
+     * ID
      */
     public String getId() {
         return id.getValue();
@@ -60,9 +53,22 @@ public class Profile {
     }
 
     /**
-     * Returns name.
-     *
-     * @return
+     * Base URL
+     */
+    public String getBaseURL() {
+        return baseURL.get();
+    }
+
+    public StringProperty baseURLProperty() {
+        return baseURL;
+    }
+
+    public void setBaseURL(String baseURL) {
+        this.baseURL.set(baseURL);
+    }
+
+    /**
+     * Name.
      */
     public String getName() {
         return name.getValue();
@@ -77,9 +83,7 @@ public class Profile {
     }
 
     /**
-     * Returns description.
-     *
-     * @return
+     * Description.
      */
     public String getDescription() {
         return description.getValue();
@@ -91,91 +95,6 @@ public class Profile {
 
     public StringProperty descriptionProperty() {
         return description;
-    }
-
-    /**
-     * Returns protocol.
-     *
-     * @return
-     */
-    public Protocol getProtocol() {
-        return protocol.getValue();
-    }
-
-    public void setProtocol(Protocol protocol) {
-        this.protocol.setValue(protocol);
-    }
-
-    public ObjectProperty<Protocol> protocolProperty() {
-        return protocol;
-    }
-
-    /**
-     * Returns username.
-     *
-     * @return
-     */
-    public String getUsername() {
-        return username.getValue();
-    }
-
-    public void setUsername(String username) {
-        this.username.setValue(username);
-    }
-
-    public StringProperty usernameProperty() {
-        return username;
-    }
-
-    /**
-     * Returns password.
-     *
-     * @return
-     */
-    public String getPassword() {
-        return password.getValue();
-    }
-
-    public void setPassword(String password) {
-        this.password.setValue(password);
-    }
-
-    public StringProperty passwordProperty() {
-        return password;
-    }
-
-    /**
-     * Returns host.
-     *
-     * @return
-     */
-    public String getHost() {
-        return host.getValue();
-    }
-
-    public void setHost(String host) {
-        this.host.setValue(host);
-    }
-
-    public StringProperty hostProperty() {
-        return host;
-    }
-
-    /**
-     * Returns port
-     *
-     * @return
-     */
-    public String getPort() {
-        return port.getValue();
-    }
-
-    public void setPort(String port) {
-        this.port.setValue(port);
-    }
-
-    public StringProperty portProperty() {
-        return port;
     }
 
     /**
@@ -195,6 +114,15 @@ public class Profile {
 
     public void addVariable(Item variable) {
         variables.add(variable);
+    }
+
+    public void addVariable(String name, String value) {
+        Item item = new Item();
+
+        item.setName(name);
+        item.setValue(value);
+
+        variables.add(item);
     }
 
     public void removeVariable(Item variable) {

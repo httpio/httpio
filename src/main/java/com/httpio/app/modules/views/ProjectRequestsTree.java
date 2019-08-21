@@ -1,11 +1,16 @@
 package com.httpio.app.modules.views;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.httpio.app.models.Project;
 import com.httpio.app.models.Request;
 import com.httpio.app.modules.controls.RequestLabel;
 import com.httpio.app.services.Icons;
 import com.httpio.app.services.ProjectSupervisor;
+import com.httpio.app.services.RequestsCreator;
+import com.httpio.app.services.Windows;
+import com.httpio.app.services.Windows.Window;
+import com.httpio.app.views.CreateFromRAW;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -28,6 +33,9 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
 
     private ProjectSupervisor projectSupervisor;
     private Icons icons;
+    private Windows windows;
+    private RequestsCreator requestsCreator;
+    private Injector injector;
 
     /**
      * Listeners
@@ -112,7 +120,17 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
      */
     private void attachContextMenu(TreeCell<ItemWrapper> cell, ItemWrapper item) {
         // Init menu
+
+        // Add request
         MenuItem itemAddRequest = new MenuItem("Add request");
+        MenuItem itemAddRequestFromRaw = new MenuItem("Add request from RAW");
+        MenuItem itemRename = new MenuItem("Rename");
+        MenuItem itemDelete = new MenuItem("Delete");
+
+        icons.attachIcon(itemAddRequest, Icons.ICON_ADD);
+        icons.attachIcon(itemAddRequestFromRaw, Icons.ICON_ADD);
+        icons.attachIcon(itemRename, Icons.ICON_RENAME);
+        icons.attachIcon(itemDelete, Icons.ICON_REMOVE);
 
         itemAddRequest.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -130,37 +148,36 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
 
                 cell.getTreeItem().getChildren().add(treeItem);
 
-                showRenameDialog(treeItem);
+                handleRenameDialog(treeItem);
             }
         });
 
-        icons.attachIcon(itemAddRequest, Icons.ICON_ADD);
-
-        MenuItem itemRename = new MenuItem("Rename");
+        itemAddRequestFromRaw.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                handleAddRequestFromRAWDialog(cell, item);
+            }
+        });
 
         itemRename.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                showRenameDialog(cell.getTreeItem());
+                handleRenameDialog(cell.getTreeItem());
             }
         });
-
-        icons.attachIcon(itemRename, Icons.ICON_RENAME);
-
-        MenuItem itemDelete = new MenuItem("Delete");
 
         itemDelete.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                showDeleteDialog(cell.getTreeItem());
+                handleDeleteDialog(cell.getTreeItem());
             }
         });
 
-        icons.attachIcon(itemDelete, Icons.ICON_REMOVE);
-
+        // Context menu
         ContextMenu contextMenu = new ContextMenu();
 
         contextMenu.getItems().add(itemAddRequest);
+        contextMenu.getItems().add(itemAddRequestFromRaw);
         contextMenu.getItems().add(itemRename);
 
         System.out.println("------------");
@@ -179,8 +196,23 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
     }
 
     @Inject
+    public void setWindows(Windows windows) {
+        this.windows = windows;
+    }
+
+    @Inject
     public void setIcons(Icons icons) {
         this.icons = icons;
+    }
+
+    @Inject
+    public void setRequestsCreator(RequestsCreator requestsCreator) {
+        this.requestsCreator = requestsCreator;
+    }
+
+    @Inject
+    public void setInjector(Injector injector) {
+        this.injector = injector;
     }
 
     /**
@@ -260,7 +292,7 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
         return found;
     }
 
-    private void showRenameDialog(TreeItem<ItemWrapper> treeItem) {
+    private void handleRenameDialog(TreeItem<ItemWrapper> treeItem) {
         TextInputDialog dialog = new TextInputDialog(treeItem.getValue().getName());
 
         dialog.setTitle("Change name of request");
@@ -273,7 +305,58 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
         }
     }
 
-    private void showDeleteDialog(TreeItem<ItemWrapper> item) {
+    private void handleAddRequestFromRAWDialog(TreeCell<ItemWrapper> cell, ItemWrapper item) {
+        CreateFromRAW createFromRAW = new CreateFromRAW();
+
+        Window<CreateFromRAW> window = windows.create(createFromRAW);
+
+        createFromRAW.messageTextProperty().setValue("Put HTTP RAW below.");
+
+        createFromRAW.getCreateButton().setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                String raw = createFromRAW.getText();
+
+                if (raw == null) {
+                    return;
+                }
+
+                // Creating request baseon HTTP RAW
+                Request created = requestsCreator.createFromHTTPRaw(raw);
+
+                if (item.isProject()) {
+                    item.getProject().addRequest(created);
+                } else {
+                    item.getRequest().addRequest(created);
+                }
+
+                // Add tree item
+                TreeItem<ItemWrapper> treeItem = new TreeItem<>(new ItemWrapper(created));
+
+                cell.getTreeItem().getChildren().add(treeItem);
+
+                window.close();
+
+                if (project != null) {
+                    project.setRequest(created);
+                }
+
+                // Show rename dialog
+                // handleRenameDialog(treeItem);
+            }
+        });
+
+        createFromRAW.getCancelButton().setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                window.close();
+            }
+        });
+
+        window.showAndWait();
+    }
+
+    private void handleDeleteDialog(TreeItem<ItemWrapper> item) {
         if (item.getValue().isProject()) {
             return;
         }

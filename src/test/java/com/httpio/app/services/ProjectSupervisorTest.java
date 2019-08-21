@@ -25,7 +25,7 @@ public class ProjectSupervisorTest {
 
         // assertEquals(r1, r1r1.getParent());
         // assertEquals("get", r1r1.getMethod());
-        // assertEquals("/offers/10", r1r1.getResourceFull());
+        // assertEquals("/offers/10", r1r1.getURLFull());
         // assertEquals("Offer with id 10.", r1r1.getName());
     }
 
@@ -61,8 +61,7 @@ public class ProjectSupervisorTest {
         // Profile
         project.addProfile(new Profile("P1"){{
             setName("Development");
-            setHost("development.api.com");
-            setProtocol(http.getProtocolById(Protocols.HTTPS));
+            setBaseURL("http://development.api.com");
 
             addHeader(new Item("P1H1"){{
                 setName("SESSIONID");
@@ -82,14 +81,12 @@ public class ProjectSupervisorTest {
 
         project.addProfile(new Profile("P2"){{
             setName("Production");
-            setHost("prodution.api.com");
-            setProtocol(http.getProtocolById(Protocols.HTTP));
+            setBaseURL("http://prodution.api.com");
         }});
 
         project.addProfile(new Profile("P3"){{
             setName("Testing");
-            setHost("testing.api.com");
-            setProtocol(http.getProtocolById(Protocols.HTTP));
+            setBaseURL("http://testing.api.com");
         }});
 
         // Set active profile
@@ -99,23 +96,23 @@ public class ProjectSupervisorTest {
         project.addRequest(new Request("R1"){{
             setName("Todos");
             setMethod(http.getMethodById(Methods.GET));
-            setResource("/todos/1");
+            setUrl("/todos/1");
         }});
 
         project.addRequest(new Request("R2"){{
             setName("Posts");
             setMethod(http.getMethodById(Methods.GET));
-            setResource("/posts");
+            setUrl("/posts");
 
             addRequest(new Request("R2R1"){{
                 setName("Post 1");
                 setMethod(http.getMethodById(Methods.GET));
-                setResource("/1");
+                setUrl("/1");
 
                 addRequest(new Request("R2R1R1"){{
                     setName("Comments for post 1");
                     setMethod(http.getMethodById(Methods.GET));
-                    setResource("/comments");
+                    setUrl("/comments");
                 }});
             }});
         }});
@@ -123,7 +120,7 @@ public class ProjectSupervisorTest {
         project.addRequest(new Request("R3"){{
             setName("Comments");
             setMethod(http.getMethodById(Methods.GET));
-            setResource("/comments");
+            setUrl("/comments");
 
             addParameter(new Item("R3P1"){{
                 setName("postId");
@@ -134,7 +131,7 @@ public class ProjectSupervisorTest {
         project.addRequest(new Request("R4"){{
             setName("Post for user 1");
             setMethod(http.getMethodById(Methods.GET));
-            setResource("/posts");
+            setUrl("/posts");
 
             addParameter(new Item("R4P1"){{
                 setName("userId");
@@ -145,25 +142,25 @@ public class ProjectSupervisorTest {
         project.addRequest(new Request("R5"){{
             setName("Create post");
             setMethod(http.getMethodById(Methods.POST));
-            setResource("/posts");
+            setUrl("/posts");
         }});
 
         project.addRequest(new Request("R6"){{
             setName("Update post");
             setMethod(http.getMethodById(Methods.PUT));
-            setResource("/posts");
+            setUrl("/posts");
         }});
 
         project.addRequest(new Request("R7"){{
             setName("Patch post 1");
             setMethod(http.getMethodById(Methods.PATCH));
-            setResource("/posts/1");
+            setUrl("/posts/1");
         }});
 
         project.addRequest(new Request("R8"){{
             setName("Delete post 1");
             setMethod(http.getMethodById(Methods.DELETE));
-            setResource("/posts/1");
+            setUrl("/posts/1");
         }});
 
         project.setRequest(project.getRequests().get(0));

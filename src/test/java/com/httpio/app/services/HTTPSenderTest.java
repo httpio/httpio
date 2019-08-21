@@ -5,7 +5,10 @@ import com.httpio.app.models.Profile;
 import com.httpio.app.models.Request;
 import com.httpio.app.services.HTTPSender.Response;
 import com.httpio.app.services.Http.Protocols;
+import junit.framework.TestCase;
 import org.junit.Test;
+
+import static junit.framework.TestCase.assertEquals;
 
 public class HTTPSenderTest {
 
@@ -18,18 +21,19 @@ public class HTTPSenderTest {
 
         Http http = new Http();
 
-        httpSender.setRequestPreparator(new RequestPreparator());
+        httpSender.setHttpRequestPreparator(new HTTPRequestPreparator());
 
         Profile profile = new Profile("p") {{
-            setHost("jsonplaceholder.typicode.com");
-            setProtocol(http.getProtocolById(Protocols.HTTP));
+            setBaseURL("http://jsonplaceholder.typicode.com");
         }};
 
         Request request = new Request();
 
         request.setMethod(http.getMethodById(Methods.GET));
-        request.setResource("/todos/1");
+        request.setUrl("/todos/1");
 
         Response response = httpSender.send(request, profile);
+
+        assertEquals("{  \"userId\": 1,  \"id\": 1,  \"title\": \"delectus aut autem\",  \"completed\": false}", response.getBody());
     }
 }

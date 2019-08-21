@@ -7,7 +7,6 @@ import com.httpio.app.modules.views.View;
 import java.io.IOException;
 
 public class ProjectView extends View<ProjectController> {
-
     /**
      * Project to display
      */

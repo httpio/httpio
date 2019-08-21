@@ -10,34 +10,35 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public class Project {
 
     /**
      * Fields
      */
-    SimpleStringProperty id = new SimpleStringProperty();
-    SimpleStringProperty name = new SimpleStringProperty();
-    SimpleStringProperty description = new SimpleStringProperty();
+    private SimpleStringProperty id = new SimpleStringProperty();
+    private SimpleStringProperty name = new SimpleStringProperty();
+    private SimpleStringProperty description = new SimpleStringProperty();
 
     /**
      * Selected profile.
      */
-    ObjectProperty<Profile> profile = new SimpleObjectProperty<>();
+    private ObjectProperty<Profile> profile = new SimpleObjectProperty<>();
 
     /**
      * Selected request.
      */
-    ObjectProperty<Request> request = new SimpleObjectProperty<>();
+    private ObjectProperty<Request> request = new SimpleObjectProperty<>();
 
     /**
      * List of profiles.
      */
-    ListProperty<Profile> profiles = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private ListProperty<Profile> profiles = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     /**
      * List of requests.
      */
-    ListProperty<Request> requests = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private ListProperty<Request> requests = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     /**
      * Constructors
@@ -190,46 +191,36 @@ public class Project {
     }
 
     public String getChecksum() {
-        String values = id.getValue() + name.getValue() + description.getValue();
+        StringBuilder values = new StringBuilder(id.getValue() + name.getValue() + description.getValue());
 
         for(Profile profile: profiles) {
-            values += profile.getId();
-            values += profile.getName();
-
-            if (profile.getProtocol() != null) {
-                values += profile.getProtocol().getId().toString();
-            }
-
-            values += profile.getUsername();
-            values += profile.getPassword();
-            values += profile.getHost();
-            values += profile.getPort();
-            values += profile.getDescription();
+            values.append(profile.getId());
+            values.append(profile.getName());
+            values.append(profile.getBaseURL());
+            values.append(profile.getDescription());
 
             for(Item variable: profile.getVariables()) {
-                values += variable.getId();
-                values += variable.getName();
-                values += variable.getValue();
+                values.append(variable.getId());
+                values.append(variable.getName());
+                values.append(variable.getValue());
             }
 
             for(Item header: profile.getHeaders()) {
-                values += header.getId();
-                values += header.getName();
-                values += header.getValue();
+                values.append(header.getId());
+                values.append(header.getName());
+                values.append(header.getValue());
             }
 
             for(Item parameter: profile.getParameters()) {
-                values += parameter.getId();
-                values += parameter.getName();
-                values += parameter.getValue();
+                values.append(parameter.getId());
+                values.append(parameter.getName());
+                values.append(parameter.getValue());
             }
         }
 
-        values += serializeRequests(requests);
+        values.append(serializeRequests(requests));
 
-        // String hash = "35454B055CC325EA1AF2126E27707052";
-        // String password = "ILoveJava";
-
+        // Create checksum
         MessageDigest md = null;
         try {
             md = MessageDigest.getInstance("MD5");
@@ -237,7 +228,7 @@ public class Project {
             e.printStackTrace();
         }
 
-        md.update(values.getBytes());
+        md.update(values.toString().getBytes());
 
         byte[] digest = md.digest();
 
@@ -250,14 +241,13 @@ public class Project {
         for(Request request: requests) {
             values += request.getId();
             values += request.getName();
+            values += request.getUrl();
             values += request.getBody();
+            values += request.isStandalone();
 
             if (request.getMethod() != null) {
                 values += request.getMethod().getId().toString();
             }
-
-            values += request.getResource();
-            values += request.getInheritResource();
 
             if (request.getParent() != null) {
                 values += request.getParent().getId();
@@ -291,15 +281,7 @@ public class Project {
         for(Profile profile: profiles) {
             System.out.print(" " + profile.getId());
             System.out.print(" - " + profile.getName());
-
-            if (profile.getProtocol() != null) {
-                System.out.print(" - " + profile.getProtocol());
-            }
-
-            System.out.print(" - " + profile.getUsername());
-            System.out.print(" - " + profile.getPassword());
-            System.out.print(" - " + profile.getHost());
-            System.out.print(" - " + profile.getPort());
+            System.out.print(" - " + profile.getBaseURL());
             System.out.print(" - " + profile.getDescription());
 
             System.out.println();
@@ -342,7 +324,7 @@ public class Project {
             }
 
             System.out.print(" - " + request.getName());
-            System.out.print(" - " + request.getResource());
+            System.out.print(" - " + request.getUrl());
             System.out.print(" - " + request.getBody());
             System.out.print(" - " + request.getInheritResource());
             System.out.println();

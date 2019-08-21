@@ -6,17 +6,18 @@ import com.httpio.app.modules.Item;
 import com.httpio.app.services.Http.Protocol;
 import com.httpio.app.services.Http.Protocols;
 import org.apache.commons.text.StringSubstitutor;
-import org.jetbrains.annotations.NotNull;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Prepares the application for general processing.
+ * Prepares the request for general processing.
  */
-public class RequestPreparator {
-    public RequestPrepared prepare(Request request, Profile profile) {
+public class HTTPRequestPreparator {
+    public RequestPrepared prepare(Request request, Profile profile) throws MalformedURLException {
         RequestPrepared prepared = new RequestPrepared();
 
         // Variables
@@ -35,10 +36,11 @@ public class RequestPreparator {
         }
 
         // Resource
-        String resource = "";
+        String url = profile.getBaseURL();
 
-        if (request.getResourceFull() != null) {
-            resource += request.getResourceFull();
+        // If url is given, then I change url. Otherwise I set url to "/" according with RFC2616.
+        if (request.getURLFull() != null) {
+            url += request.getURLFull();
         }
 
         // Parameters
@@ -53,26 +55,24 @@ public class RequestPreparator {
         }
 
         if (parameters.size() > 0) {
-            resource += "?";
+            url += "?";
 
             for(Map.Entry<String, String> parameter: parameters.entrySet()) {
-                resource += parameter.getKey() + "=" + parameter.getValue() + "&";
+                url += parameter.getKey() + "=" + parameter.getValue() + "&";
             }
 
-            resource = resource.substring(0, resource.length() - 1);
+            url = url.substring(0, url.length() - 1);
         }
 
-        prepared.setResource(substitutor.replace(resource));
+        // URL netURL = new URL(url);
+
+        prepared.setUrl(substitutor.replace(url));
 
         // Protocol
-        prepared.setProtocol(profile.getProtocol());
+        // prepared.setProtocol(profile.getProtocol());
 
         // Headers
         HashMap<String, String> headers = new HashMap<>();
-
-        if (profile.getHost() != null) {
-            headers.put("Host", profile.getHost());
-        }
 
         for(Item header: profile.getHeaders()) {
             headers.put(header.getName(), header.getValue());
@@ -88,7 +88,7 @@ public class RequestPreparator {
             prepared.setBody(substitutor.replace(request.getBody()));
         }
 
-        // Replace headeres
+        // Replace headers
         HashMap<String, String> headersReplaced = new HashMap<>();
 
         for(Map.Entry<String, String> entry: headers.entrySet()) {
@@ -96,7 +96,6 @@ public class RequestPreparator {
         }
 
         prepared.setHeaders(headersReplaced);
-
 
         return prepared;
     }
@@ -106,17 +105,16 @@ public class RequestPreparator {
      */
     public static class RequestPrepared {
         String method;
-        String resource;
+        String url;
         Protocol protocol;
 
         HashMap<String, String> headers = new HashMap<>();
 
         String body;
 
-        public String getUrl() {
-            return protocol + "://" + headers.get("Host") + resource;
-        }
-
+        /**
+         * Method
+         */
         public String getMethod() {
             return method;
         }
@@ -125,22 +123,20 @@ public class RequestPreparator {
             this.method = method;
         }
 
-        public String getResource() {
-            return resource;
+        /**
+         * URL
+         */
+        public String getUrl() {
+            return url;
         }
 
-        public void setResource(String resource) {
-            this.resource = resource;
+        public void setUrl(String url) {
+            this.url = url;
         }
 
-        public Protocol getProtocol() {
-            return protocol;
-        }
-
-        public void setProtocol(Protocol protocol) {
-            this.protocol = protocol;
-        }
-
+        /**
+         * Headers
+         */
         public HashMap<String, String> getHeaders() {
             return headers;
         }
@@ -150,6 +146,9 @@ public class RequestPreparator {
             this.headers.putAll(headers);
         }
 
+        /**
+         * Body
+         */
         public String getBody() {
             return body;
         }
@@ -158,27 +157,39 @@ public class RequestPreparator {
             this.body = body;
         }
 
-        public String toRaw() {
-            String lineA = "";
+        public String toRaw() throws MalformedURLException {
+            // Lines
             ArrayList<String> lines = new ArrayList<>();
 
+            // Copy headers
+            HashMap<String, String> headers = new HashMap<>(this.headers);
+
+            // First line
+            String lineA = "";
             if (method != null) {
                 lineA += method + " ";
             }
 
-            if (resource != null) {
-                lineA += resource;
+            URL urlNet = new URL(url);
+
+            headers.put("Host", urlNet.getHost());
+
+            if (urlNet.getPath() != null && urlNet.getQuery() != null) {
+                lineA += urlNet.getPath() + "?" + urlNet.getQuery();
+            } else if (urlNet.getPath() != null) {
+                lineA += urlNet.getPath();
+            } else if (urlNet.getQuery() != null) {
+                lineA += "/?" + urlNet.getQuery();
+            } else {
+                // This should not happened.
+                lineA += "/";
             }
 
-            // Protocol
-            if (protocol != null) {
-                if (protocol.getId() == Protocols.HTTP || protocol.getId() == Protocols.HTTPS) {
-                    lineA += " HTTP/1.1";
-                }
-            }
+            lineA += " HTTP/1.1";
 
             lines.add(lineA);
 
+            // headers
             for(Map.Entry<String, String> entry: headers.entrySet()) {
                 lines.add(entry.getKey() + ": " + entry.getValue());
             }
@@ -187,6 +198,7 @@ public class RequestPreparator {
                 lines.add("\n" + body);
             }
 
+            // Create RAW
             String raw = "";
             int index = 0;
             int size = lines.size();

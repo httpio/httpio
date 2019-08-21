@@ -47,26 +47,23 @@ public class ProjectSupervisor {
 
     public void loadJsonHolderProject() {
         Project project = new Project() {{
-            setName("Json holder");
+            setName("Jsonholder");
         }};
 
         // Profile
         project.addProfile(new Profile(){{
             setName("Development");
-            setHost("dev.jsonplaceholder.typicode.com");
-            setProtocol(http.getProtocolById(Protocols.HTTP));
+            setBaseURL("http://dev.jsonplaceholder.typicode.com");
         }});
 
         project.addProfile(new Profile(){{
             setName("Production");
-            setHost("jsonplaceholder.typicode.com");
-            setProtocol(http.getProtocolById(Protocols.HTTP));
+            setBaseURL("http://jsonplaceholder.typicode.com");
         }});
 
         project.addProfile(new Profile(){{
             setName("Testing");
-            setHost("testing.jsonplaceholder.typicode.com");
-            setProtocol(http.getProtocolById(Protocols.HTTP));
+            setBaseURL("http://testing.jsonplaceholder.typicode.com");
         }});
 
         project.setProfile(project.getProfiles().get(0));
@@ -75,23 +72,23 @@ public class ProjectSupervisor {
         project.addRequest(new Request(){{
             setName("Todos");
             setMethod(http.getMethodById(Methods.GET));
-            setResource("/todos/1");
+            setUrl("/todos/1");
         }});
 
         project.addRequest(new Request(){{
             setName("Posts");
             setMethod(http.getMethodById(Methods.GET));
-            setResource("/posts");
+            setUrl("/posts");
 
             addRequest(new Request(){{
                 setName("Post 1");
                 setMethod(http.getMethodById(Methods.GET));
-                setResource("/1");
+                setUrl("/1");
 
                 addRequest(new Request(){{
                     setName("Comments for post 1");
                     setMethod(http.getMethodById(Methods.GET));
-                    setResource("/comments");
+                    setUrl("/comments");
                 }});
             }});
         }});
@@ -99,7 +96,7 @@ public class ProjectSupervisor {
         // project.addRequest(new Request(){{
         //     setName("Comments");
         //     setMethod(http.getMethodById(Methods.GET));
-        //     setResource("/comments");
+        //     setUrl("/comments");
 
         //     addParameter(new Item(){{
         //         setName("postId");
@@ -110,7 +107,7 @@ public class ProjectSupervisor {
         // project.addRequest(new Request(){{
         //     setName("Post for user 1");
         //     setMethod(http.getMethodById(Methods.GET));
-        //     setResource("/posts");
+        //     setUrl("/posts");
 
         //     addParameter(new Item(){{
         //         setName("userId");
@@ -121,25 +118,25 @@ public class ProjectSupervisor {
         // project.addRequest(new Request(){{
         //     setName("Create post");
         //     setMethod(http.getMethodById(Methods.POST));
-        //     setResource("/posts");
+        //     setUrl("/posts");
         // }});
 
         // project.addRequest(new Request(){{
         //     setName("Update post");
         //     setMethod(http.getMethodById(Methods.PUT));
-        //     setResource("/posts");
+        //     setUrl("/posts");
         // }});
 
         // project.addRequest(new Request(){{
         //     setName("Patch post 1");
         //     setMethod(http.getMethodById(Methods.PATCH));
-        //     setResource("/posts/1");
+        //     setUrl("/posts/1");
         // }});
 
         // project.addRequest(new Request(){{
         //     setName("Delete post 1");
         //     setMethod(http.getMethodById(Methods.DELETE));
-        //     setResource("/posts/1");
+        //     setUrl("/posts/1");
         // }});
 
         project.setRequest(project.getRequests().get(0));
@@ -152,7 +149,7 @@ public class ProjectSupervisor {
 
         request.setName("New request");
         request.setMethod(http.getMethodById(Methods.GET));
-        request.setResource("/...");
+        request.setUrl("/...");
 
         return request;
     }
@@ -161,7 +158,7 @@ public class ProjectSupervisor {
         Profile profile = new Profile();
 
         profile.setName("New profile");
-        profile.setProtocol(http.getProtocolById(Protocols.HTTP));
+        profile.setBaseURL("http://domain.com");
 
         return profile;
     }
@@ -261,15 +258,8 @@ public class ProjectSupervisor {
 
             elementProfile.setAttribute("id", profile.getId());
             elementProfile.setAttribute("name", profile.getName());
-            elementProfile.setAttribute("username", profile.getUsername());
-            elementProfile.setAttribute("password", profile.getPassword());
-            elementProfile.setAttribute("host", profile.getHost());
-            elementProfile.setAttribute("port", profile.getPort());
+            elementProfile.setAttribute("baseURL", profile.getBaseURL());
             elementProfile.setAttribute("description", profile.getDescription());
-
-            if (profile.getProtocol() != null) {
-                elementProfile.setAttribute("protocol", profile.getProtocol().getId().toString());
-            }
 
             // Variables
             Element elementVariables = document.createElement("Variables");
@@ -348,12 +338,14 @@ public class ProjectSupervisor {
 
             elementRequest.setAttribute("id", request.getId());
             elementRequest.setAttribute("name", request.getName());
-            elementRequest.setAttribute("resource", request.getResource());
+            elementRequest.setAttribute("url", request.getUrl());
             elementRequest.setAttribute("body", request.getBody());
-            elementRequest.setAttribute("inheritResource", request.getInheritResource() ? "1" : "0");
+            elementRequest.setAttribute("standalone", request.isStandalone() ? "1" : "0");
 
             if (request.getMethod() != null) {
                 elementRequest.setAttribute("method", request.getMethod().getId().toString());
+            } else {
+                elementRequest.setAttribute("method", null);
             }
 
             // Headers
@@ -436,12 +428,8 @@ public class ProjectSupervisor {
 
             profile.setId(emptyNull(elementProfile.getAttribute("id")));
             profile.setName(emptyNull(elementProfile.getAttribute("name")));
-            profile.setPort(emptyNull(elementProfile.getAttribute("port")));
-            profile.setHost(emptyNull(elementProfile.getAttribute("host")));
-            profile.setPassword(emptyNull(elementProfile.getAttribute("password")));
-            profile.setUsername(emptyNull(elementProfile.getAttribute("username")));
+            profile.setBaseURL(emptyNull(elementProfile.getAttribute("baseURL")));
             profile.setDescription(emptyNull(elementProfile.getAttribute("description")));
-            profile.setProtocol(http.getProtocolById(emptyNull(elementProfile.getAttribute("protocol"))));
 
             // Headers
             Node headers = findChildNodeByTagName(elementProfile, "Headers");
@@ -534,8 +522,7 @@ public class ProjectSupervisor {
         // Profile
         project.addProfile(new Profile(){{
             setName("Development");
-            setHost("domain.com");
-            setProtocol(http.getProtocolById(Protocols.HTTP));
+            setBaseURL("http://domain.com");
         }});
 
         project.setProfile(project.getProfiles().get(0));
@@ -544,7 +531,7 @@ public class ProjectSupervisor {
         project.addRequest(new Request(){{
             setName("Users");
             setMethod(http.getMethodById(Methods.GET));
-            setResource("/users");
+            setUrl("/users");
         }});
 
         project.setRequest(project.getRequests().get(0));
@@ -566,11 +553,11 @@ public class ProjectSupervisor {
             Request request = new Request();
 
             request.setId(emptyNull(elementRequest.getAttribute("id")));
-            request.setResource(emptyNull(elementRequest.getAttribute("resource")));
+            request.setUrl(emptyNull(elementRequest.getAttribute("url")));
             request.setMethod(http.getMethodById(emptyNull(elementRequest.getAttribute("method"))));
             request.setName(emptyNull(elementRequest.getAttribute("name")));
             request.setBody(emptyNull(elementRequest.getAttribute("body")));
-            request.setInheritResource(emptyNull(elementRequest.getAttribute("inheritResource")).equals("1"));
+            request.setStandalone(emptyNull(elementRequest.getAttribute("standalone")).equals("1"));
 
             // Headers
             Node headers = findChildNodeByTagName(elementRequest, "Headers");

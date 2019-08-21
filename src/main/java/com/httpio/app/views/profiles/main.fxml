@@ -3,7 +3,6 @@
 <?import com.httpio.app.modules.views.TableViewNameValue?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.SplitPane?>
@@ -31,31 +30,22 @@
          <children>
             <GridPane hgap="5.0" vgap="5.0">
               <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="119.0" prefWidth="152.0" />
-                <ColumnConstraints hgrow="SOMETIMES" />
-                  <ColumnConstraints hgrow="SOMETIMES" percentWidth="70.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="306.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" />
               </columnConstraints>
               <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="100.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Host" />
-                  <Label text="Protocol" GridPane.rowIndex="1" />
-                  <Label text="Port" GridPane.rowIndex="2" />
-                  <Label text="Username" GridPane.rowIndex="3" />
-                  <Label text="Password" GridPane.rowIndex="4" />
-                  <Label text="Description" GridPane.rowIndex="5" />
-                  <TextField fx:id="hostTextField" GridPane.columnIndex="1" />
-                  <TextField fx:id="portTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <TextField fx:id="usernameTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                  <TextField fx:id="passwordTextField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                  <TextArea fx:id="descriptionTextField" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                  <ComboBox fx:id="protocolField" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label text="Description" GridPane.rowIndex="2" />
+                  <TextArea fx:id="descriptionTextField" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <TextField fx:id="nameField" GridPane.columnIndex="1" />
+                  <Label text="Name" />
+                  <Label text="Base URL" GridPane.rowIndex="1" />
+                  <TextField fx:id="baseURLField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                </children>
             </GridPane>
             <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">

@@ -39,19 +39,10 @@ public class ProfilesController implements ControllerInterface {
     private Button newProfileButton;
 
     @FXML
-    private TextField hostTextField;
+    private TextField nameField;
 
     @FXML
-    private ComboBox<Protocol> protocolField;
-
-    @FXML
-    private TextField portTextField;
-
-    @FXML
-    private TextField usernameTextField;
-
-    @FXML
-    private TextField passwordTextField;
+    private TextField baseURLField;
 
     @FXML
     private TextArea descriptionTextField;
@@ -94,8 +85,6 @@ public class ProfilesController implements ControllerInterface {
                 loadProfile(profile);
             }
         });
-
-        protocolField.setItems(http.getProtocols());
 
         prepareProfilesListView();
 
@@ -199,6 +188,8 @@ public class ProfilesController implements ControllerInterface {
     }
 
     private void prepareVariablesTable() {
+        variablesTableView.setIcons(icons);
+
         variablesTableView.setItemFactory(new Callback<String, Item>() {
             @Override
             public Item call(String s) {
@@ -221,6 +212,8 @@ public class ProfilesController implements ControllerInterface {
     }
 
     private void prepareHeadersTableView() {
+        headersTableView.setIcons(icons);
+
         headersTableView.setItemFactory(new Callback<String, Item>() {
             @Override
             public Item call(String s) {
@@ -243,6 +236,8 @@ public class ProfilesController implements ControllerInterface {
     }
 
     private void prepareParametersTableView() {
+        parametersTableView.setIcons(icons);
+
         parametersTableView.setItemFactory(new Callback<String, Item>() {
             @Override
             public Item call(String s) {
@@ -309,12 +304,9 @@ public class ProfilesController implements ControllerInterface {
      */
     private void loadProfile(Profile profile) {
         if (this.profile != null) {
-            hostTextField.textProperty().unbindBidirectional(this.profile.hostProperty());
+            nameField.textProperty().unbindBidirectional(this.profile.nameProperty());
+            baseURLField.textProperty().unbindBidirectional(this.profile.baseURLProperty());
 
-            protocolField.valueProperty().unbindBidirectional(this.profile.protocolProperty());
-            portTextField.textProperty().unbindBidirectional(this.profile.portProperty());
-            usernameTextField.textProperty().unbindBidirectional(this.profile.usernameProperty());
-            passwordTextField.textProperty().unbindBidirectional(this.profile.passwordProperty());
             descriptionTextField.textProperty().unbindBidirectional(this.profile.descriptionProperty());
 
             variablesTableView.itemsProperty().unbindBidirectional(this.profile.variablesProperty());
@@ -330,12 +322,9 @@ public class ProfilesController implements ControllerInterface {
             return;
         }
 
-        hostTextField.textProperty().bindBidirectional(this.profile.hostProperty());
+        nameField.textProperty().bindBidirectional(this.profile.nameProperty());
+        baseURLField.textProperty().bindBidirectional(this.profile.baseURLProperty());
 
-        protocolField.valueProperty().bindBidirectional(this.profile.protocolProperty());
-        portTextField.textProperty().bindBidirectional(this.profile.portProperty());
-        usernameTextField.textProperty().bindBidirectional(this.profile.usernameProperty());
-        passwordTextField.textProperty().bindBidirectional(this.profile.passwordProperty());
         descriptionTextField.textProperty().bindBidirectional(this.profile.descriptionProperty());
 
         variablesTableView.itemsProperty().bindBidirectional(this.profile.variablesProperty());

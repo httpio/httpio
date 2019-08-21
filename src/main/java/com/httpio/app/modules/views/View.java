@@ -4,6 +4,9 @@ import com.google.inject.Injector;
 import com.httpio.app.modules.ControllerInterface;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import java.io.IOException;
 
@@ -29,6 +32,15 @@ public class View<T extends ControllerInterface> {
 
     public Parent getView() {
         return view;
+    }
+
+    public void showAndWait() {
+        Scene scene = new Scene(view, 300, 200);
+        Stage stage = new Stage();
+
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setScene(scene);
+        stage.showAndWait();
     }
 
     public T getController() {

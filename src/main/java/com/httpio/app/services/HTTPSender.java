@@ -3,7 +3,7 @@ package com.httpio.app.services;
 import com.google.inject.Inject;
 import com.httpio.app.models.Profile;
 import com.httpio.app.models.Request;
-import com.httpio.app.services.RequestPreparator.RequestPrepared;
+import com.httpio.app.services.HTTPRequestPreparator.RequestPrepared;
 
 import java.io.*;
 import java.net.*;
@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.Map;
 
 public class HTTPSender {
-    private RequestPreparator requestPreparator;
+    private HTTPRequestPreparator httpRequestPreparator;
 
     private Logger logger;
 
     @Inject
-    public void setRequestPreparator(RequestPreparator requestPreparator) {
-        this.requestPreparator = requestPreparator;
+    public void setHttpRequestPreparator(HTTPRequestPreparator httpRequestPreparator) {
+        this.httpRequestPreparator = httpRequestPreparator;
     }
 
     @Inject
@@ -37,7 +37,7 @@ public class HTTPSender {
      * @return
      */
     public Response send(Request request, Profile profile) throws Exception {
-        RequestPrepared prepared = requestPreparator.prepare(request, profile);
+        RequestPrepared prepared = httpRequestPreparator.prepare(request, profile);
 
         URL url = new URL(prepared.getUrl());
 

@@ -1,6 +1,7 @@
 package com.httpio.app.services;
 
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,6 +17,15 @@ public class Icons {
     public static final String ICON_CLOSE = "p1/Close.png";
 
     public void attachIcon(MenuItem item, String icon) {
+        ImageView iconImage = new ImageView(new Image(getClass().getResourceAsStream("/icons/" + icon)));
+
+        iconImage.setFitHeight(15);
+        iconImage.setFitWidth(15);
+
+        item.setGraphic(iconImage);
+    }
+
+    public void attachIcon(Button item, String icon) {
         ImageView iconImage = new ImageView(new Image(getClass().getResourceAsStream("/icons/" + icon)));
 
         iconImage.setFitHeight(15);

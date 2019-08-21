@@ -72,7 +72,7 @@ public class RequestLabel extends VBox {
             }
         });
 
-        resource.textProperty().bind(request.resourceProperty());
+        resource.textProperty().bind(request.urlProperty());
     }
 
     public Request getRequest() {

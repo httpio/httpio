@@ -47,7 +47,7 @@
                           <children>
                               <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Method" />
                               <Text strokeType="OUTSIDE" strokeWidth="0.0" text="URL" GridPane.columnIndex="1" />
-                              <TextField fx:id="requestResourceTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <TextField fx:id="urlField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <ComboBox fx:id="requestMethod" prefWidth="150.0" GridPane.rowIndex="1" />
                         <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
                            <children>

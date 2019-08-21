@@ -1,14 +1,16 @@
 package com.httpio.app.modules.views;
 
+import com.google.inject.Inject;
 import com.httpio.app.modules.ItemInterface;
+import com.httpio.app.services.Icons;
 import javafx.beans.property.ObjectProperty;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -23,21 +25,22 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class TableViewNameValue<T extends ItemInterface> extends VBox implements Initializable {
+    private TableColumn<T, String> columnName;
+    private TableColumn<T, String> columnValue;
+    private TableColumn<T, String> columnActions;
 
-    TableColumn<T, String> columnName;
-    TableColumn<T, String> columnValue;
-    TableColumn<T, String> columnActions;
+    private Icons icons;
 
     /**
      * Events
      */
-    Callback onChange;
+    private Callback onChange;
 
     /**
      * Factories
      */
-    Callback<String, T> itemFactory;
-    Callback<T, ?> itemRemover;
+    private Callback<String, T> itemFactory;
+    private Callback<T, ?> itemRemover;
 
     /**
      * Fields
@@ -59,6 +62,7 @@ public class TableViewNameValue<T extends ItemInterface> extends VBox implements
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("TableViewNameValue.fxml"));
+
             loader.setController(this);
             loader.setRoot(this);
             loader.load();
@@ -107,8 +111,6 @@ public class TableViewNameValue<T extends ItemInterface> extends VBox implements
                 T item = event.getTableView().getItems().get(index);
 
                 item.setName(event.getNewValue());
-
-                // if (onChange != null) onChange.call(null);
             }
         });
 
@@ -125,8 +127,6 @@ public class TableViewNameValue<T extends ItemInterface> extends VBox implements
                 T item = event.getTableView().getItems().get(index);
 
                 item.setValue(event.getNewValue());
-
-                // if (onChange != null) onChange.call(null);
             }
         });
 
@@ -157,16 +157,12 @@ public class TableViewNameValue<T extends ItemInterface> extends VBox implements
                             return;
                         }
 
+                        // Set actions
                         T item = (T) getTableRow().getItem();
 
-                        remove.setAlignment(Pos.CENTER);
-
-                        ImageView icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/trash-32.png")));
-
-                        remove.setGraphic(icon);
+                        icons.attachIcon(remove, Icons.ICON_REMOVE);
 
                         remove.getStyleClass().clear();
-                        remove.getStyleClass().add("table-params-action-button");
 
                         remove.setOnAction(new EventHandler<ActionEvent>() {
                             @Override
@@ -188,6 +184,11 @@ public class TableViewNameValue<T extends ItemInterface> extends VBox implements
         tableView.getColumns().add(columnName);
         tableView.getColumns().add(columnValue);
         tableView.getColumns().add(columnActions);
+    }
+
+    @Inject
+    public void setIcons(Icons icons) {
+        this.icons = icons;
     }
 
     /**
