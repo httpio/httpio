@@ -47,6 +47,10 @@ public class Item implements ItemInterface<Item> {
         this.id.setValue(id);
     }
 
+    public StringProperty idProperty() {
+        return id;
+    }
+
     @Override
     public String getName() {
         return name.getValue();
