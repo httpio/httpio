@@ -2,6 +2,7 @@ package com.httpio.app.services;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.paint.Color;
 
 public class Http {
     private ObservableList<Method> methods = FXCollections.observableArrayList();
@@ -78,6 +79,30 @@ public class Http {
         @Override
         public String toString() {
             return name;
+        }
+
+        public Color getColor() {
+            if (id == Methods.GET) {
+                return Color.LIGHTBLUE;
+            } else if (id == Methods.HEAD) {
+                return Color.SILVER;
+            } else if (id == Methods.PUT) {
+                return Color.ORANGE;
+            } else if (id == Methods.POST) {
+                return Color.LIGHTGREEN;
+            } else if (id == Methods.DELETE) {
+                return Color.CRIMSON;
+            } else if (id == Methods.OPTIONS) {
+                return Color.SILVER;
+            } else if (id == Methods.TRACE) {
+                return Color.SILVER;
+            } else if (id == Methods.CONNECT) {
+                return Color.SILVER;
+            } else if (id == Methods.PATCH) {
+                return Color.AZURE;
+            } else {
+                return null;
+            }
         }
 
         public String toHTTPHeader() {
