@@ -282,15 +282,17 @@ public class ProfilesController implements ControllerInterface {
         // Bind with new profiles
         profilesListView.itemsProperty().bind(project.profilesProperty());
 
-        listenersContainer.attach(project.profileProperty(), (observable, old, profile) -> {
-            profilesListView.getSelectionModel().select(profile);
-        });
+        // listenersContainer.attach(project.profileProperty(), (observable, old, profile) -> {
+        //     profilesListView.getSelectionModel().select(profile);
+        // });
 
-        listenersContainer.attach(profilesListView.getSelectionModel().selectedItemProperty(), (observable, old, profile) -> {
-            project.setProfile(profile);
+        // listenersContainer.attach(profilesListView.getSelectionModel().selectedItemProperty(), (observable, old, profile) -> {
+        //     project.setProfile(profile);
 
-            loadProfile(profile);
-        });
+        //     loadProfile(profile);
+        // });
+
+        loadProfile(project.getProfile());
 
         // Select profile
         profilesListView.getSelectionModel().select(project.getProfile());
