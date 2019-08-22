@@ -10,6 +10,8 @@ import com.httpio.app.modules.views.TableViewNameValue;
 import com.httpio.app.services.Http;
 import com.httpio.app.services.Icons;
 import com.httpio.app.services.ProjectSupervisor;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -282,17 +284,12 @@ public class ProfilesController implements ControllerInterface {
         // Bind with new profiles
         profilesListView.itemsProperty().bind(project.profilesProperty());
 
-        // listenersContainer.attach(project.profileProperty(), (observable, old, profile) -> {
-        //     profilesListView.getSelectionModel().select(profile);
-        // });
-
-        // listenersContainer.attach(profilesListView.getSelectionModel().selectedItemProperty(), (observable, old, profile) -> {
-        //     project.setProfile(profile);
-
-        //     loadProfile(profile);
-        // });
-
-        loadProfile(project.getProfile());
+        listenersContainer.attach(profilesListView.getSelectionModel().selectedItemProperty(), new ChangeListener<Profile>() {
+            @Override
+            public void changed(ObservableValue<? extends Profile> observable, Profile old, Profile profile) {
+                loadProfile(profile);
+            }
+        });
 
         // Select profile
         profilesListView.getSelectionModel().select(project.getProfile());
