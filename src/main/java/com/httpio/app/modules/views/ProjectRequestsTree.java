@@ -1,7 +1,6 @@
 package com.httpio.app.modules.views;
 
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.httpio.app.models.Project;
 import com.httpio.app.models.Request;
 import com.httpio.app.modules.controls.RequestLabel;
@@ -28,14 +27,13 @@ import static com.httpio.app.modules.views.ProjectRequestsTree.*;
 /**
  * Basic view to support the submission tree view for projects.
  */
+@SuppressWarnings("ALL")
 public class ProjectRequestsTree extends TreeView<ItemWrapper> {
     private Project project;
-
     private ProjectSupervisor projectSupervisor;
     private Icons icons;
     private Windows windows;
     private RequestsCreator requestsCreator;
-    private Injector injector;
 
     /**
      * Listeners
@@ -48,7 +46,7 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
     };
 
     /**
-     * Init request tree.
+     * Constructors
      */
     public ProjectRequestsTree() {
         super();
@@ -60,17 +58,19 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
 
                 if (item.getValue() == null) return;
 
-                if (item.getValue().isProject()) {
-                    // if (old == null) {
-                    //     project.setRequest(null);
-                    // } else {
-                    //     project.setRequest(old.getValue().getRequest());
+                // if (item.getValue().isProject()) {
+                //     // if (old == null) {
+                //     //     project.setRequest(null);
+                //     // } else {
+                //     //     project.setRequest(old.getValue().getRequest());
 
-                    //     // getSelectionModel().select(old);
-                    // }
-                } else {
-                    project.setRequest(item.getValue().getRequest());
-                }
+                //     //     // getSelectionModel().select(old);
+                //     // }
+                // } else {
+                //     project.setRequest(item.getValue().getRequest());
+                // }
+
+                project.setRequest(item.getValue().getRequest());
             }
         });
 
@@ -113,10 +113,7 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
     }
 
     /**
-     * Attachs context menu for cell
-     *
-     * @param cell
-     * @param item
+     * Attach context menu for cell.
      */
     private void attachContextMenu(TreeCell<ItemWrapper> cell, ItemWrapper item) {
         // Init menu
@@ -180,9 +177,6 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
         contextMenu.getItems().add(itemAddRequestFromRaw);
         contextMenu.getItems().add(itemRename);
 
-        System.out.println("------------");
-        System.out.println("size: " + project.getRequests().size());
-
         if (cell.getTreeItem() != getRoot() && project.getRequests().size() > 1) {
             contextMenu.getItems().add(itemDelete);
         }
@@ -210,15 +204,8 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
         this.requestsCreator = requestsCreator;
     }
 
-    @Inject
-    public void setInjector(Injector injector) {
-        this.injector = injector;
-    }
-
     /**
      * Set active project.
-     *
-     * @param project
      */
     public void setProject(Project project) {
         if (this.project != null) {
@@ -300,6 +287,7 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
 
         Optional<String> result = dialog.showAndWait();
 
+        //noinspection OptionalIsPresent
         if (result.isPresent()) {
             treeItem.getValue().setName(result.get());
         }
@@ -340,9 +328,6 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
                 if (project != null) {
                     project.setRequest(created);
                 }
-
-                // Show rename dialog
-                // handleRenameDialog(treeItem);
             }
         });
 
@@ -380,22 +365,25 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
             } else {
                 project.removeRequest(request);
 
-                project.setRequestAfterRemove();
+                project.reloadRequestAfterRemove();
             }
         }
     }
 
     /**
-     * A tree or a design element may be a request. ItemWrapper aims to unify the interfaces for TreeView.
+     * A tree or a design element may be a request.
+     * ItemWrapper aims to unify the interfaces for TreeView.
      */
     public static class ItemWrapper {
         Project project;
         Request request;
 
+        @SuppressWarnings("WeakerAccess")
         public ItemWrapper(Project project) {
             this.project = project;
         }
 
+        @SuppressWarnings("WeakerAccess")
         public ItemWrapper(Request request) {
             this.request = request;
         }

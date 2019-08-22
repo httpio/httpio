@@ -180,7 +180,6 @@ public class ProjectController implements ControllerInterface {
 
         requestsTree.setProjectSupervisor(projectSupervisor);
         requestsTree.setIcons(icons);
-        requestsTree.setInjector(injector);
         requestsTree.setWindows(windows);
         requestsTree.setRequestsCreator(requestsCreator);
 

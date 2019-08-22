@@ -5,7 +5,6 @@ import com.httpio.app.models.Project;
 import com.httpio.app.models.Request;
 import com.httpio.app.modules.Item;
 import com.httpio.app.services.Http.Methods;
-import com.httpio.app.services.Http.Protocols;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;

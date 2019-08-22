@@ -104,6 +104,7 @@ public class Profile {
         return variables.get();
     }
 
+    @SuppressWarnings("unused")
     public void setVariables(ObservableList<Item> variables) {
         this.variables.set(variables);
     }
@@ -125,6 +126,7 @@ public class Profile {
         variables.add(item);
     }
 
+    @SuppressWarnings("unused")
     public void removeVariable(Item variable) {
         variables.remove(variable);
     }
@@ -136,6 +138,7 @@ public class Profile {
         return headers.get();
     }
 
+    @SuppressWarnings("unused")
     public void setHeaders(ObservableList<Item> headers) {
         this.headers.set(headers);
     }
@@ -159,6 +162,7 @@ public class Profile {
         return parameters.get();
     }
 
+    @SuppressWarnings("unused")
     public void setParameters(ObservableList<Item> parameters) {
         this.parameters.set(parameters);
     }

@@ -1,27 +1,26 @@
 package com.httpio.app.modules.controls;
 
 import com.httpio.app.models.Request;
-import com.httpio.app.modules.ListenersContainer;
-import com.httpio.app.services.Http;
 import com.httpio.app.services.Http.Method;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 public class RequestLabel extends VBox {
-    HBox hbox = new HBox();
+    private HBox hbox = new HBox();
 
-    Text text = new Text();
-    Text method = new Text();
-    Text resource = new Text();
+    private Text text = new Text();
+    private Text method = new Text();
+    private Text resource = new Text();
 
-    ObjectProperty<Request> request = new SimpleObjectProperty<>();
+    private ObjectProperty<Request> request = new SimpleObjectProperty<>();
 
+    /**
+     * Constructors
+     */
     public RequestLabel() {
         super();
 
@@ -44,15 +43,13 @@ public class RequestLabel extends VBox {
         resource.getStyleClass().clear();
         resource.getStyleClass().add("httpio-controls-request-label__resource");
 
-        request.addListener(new ChangeListener<Request>() {
-            @Override
-            public void changed(ObservableValue<? extends Request> observable, Request old, Request request) {
-                loadRequest(old, request);
-            }
+        request.addListener((observable, old, request) -> {
+            // loadRequest(old, request);
+            loadRequest(request);
         });
     }
 
-    private void loadRequest(Request previous, Request request) {
+    private void loadRequest(Request request) {
         text.textProperty().bind(request.nameProperty());
 
         method.textProperty().bind(new StringBinding() {
@@ -75,6 +72,9 @@ public class RequestLabel extends VBox {
         resource.textProperty().bind(request.urlProperty());
     }
 
+    /**
+     * Request
+     */
     public Request getRequest() {
         return request.get();
     }

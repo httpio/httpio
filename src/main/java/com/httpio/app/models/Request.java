@@ -21,19 +21,8 @@ public class Request {
 
     private Request parent;
 
-    /**
-     * Headers
-     */
     private ListProperty<Item> headers = new SimpleListProperty<>(FXCollections.observableArrayList());
-
-    /**
-     * Params
-     */
     private ListProperty<Item> parameters = new SimpleListProperty<>(FXCollections.observableArrayList());
-
-    /**
-     * Sub requests
-     */
     private ListProperty<Request> requests = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     /**

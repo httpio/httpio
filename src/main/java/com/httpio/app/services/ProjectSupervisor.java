@@ -6,7 +6,6 @@ import com.httpio.app.models.Project;
 import com.httpio.app.models.Request;
 import com.httpio.app.services.Http.Methods;
 import com.httpio.app.modules.Item;
-import com.httpio.app.services.Http.Protocols;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;
@@ -35,10 +34,10 @@ import org.xml.sax.SAXException;
  * The class responsible for reading and saving projects.
  */
 public class ProjectSupervisor {
-    ObjectProperty<Project> project = new SimpleObjectProperty<>();
-    SimpleStringProperty projectFilePath = new SimpleStringProperty();
+    private ObjectProperty<Project> project = new SimpleObjectProperty<>();
+    private SimpleStringProperty projectFilePath = new SimpleStringProperty();
 
-    Http http;
+    private Http http;
 
     @Inject
     public void setHttp(Http http) {
@@ -165,8 +164,6 @@ public class ProjectSupervisor {
 
     /**
      * Return active project.
-     *
-     * @return
      */
     public Project getProject() {
         return project.getValue();
@@ -174,8 +171,6 @@ public class ProjectSupervisor {
 
     /**
      * Set project and emits events of change.
-     *
-     * @param project
      */
     public void setProject(Project project) {
         this.project.setValue(project);
@@ -187,8 +182,6 @@ public class ProjectSupervisor {
 
     /**
      * Returns project file path.
-     *
-     * @return
      */
     public String getProjectFilePath() {
         return projectFilePath.get();
@@ -200,8 +193,6 @@ public class ProjectSupervisor {
 
     /**
      * Save active project.
-     *
-     * @throws Exception
      */
     public void save() throws Exception {
         save(project.getValue(), projectFilePath.getValue());
@@ -209,10 +200,6 @@ public class ProjectSupervisor {
 
     /**
      * Save active project.
-     *
-     * @param path
-     *
-     * @throws Exception
      */
     public void save(String path) throws Exception {
         save(project.getValue(), path);
@@ -220,11 +207,6 @@ public class ProjectSupervisor {
 
     /**
      * Save project at given path.
-     *
-     * @param project
-     * @param path
-     *
-     * @throws Exception
      */
     public void save(Project project, String path) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -393,12 +375,6 @@ public class ProjectSupervisor {
 
     /**
      * Load project from given path.
-     *
-     * @param path
-     * @return
-     *
-     * @throws JAXBException
-     * @throws FileNotFoundException
      */
     public void load(String path) throws IOException, ParserConfigurationException, SAXException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -433,8 +409,6 @@ public class ProjectSupervisor {
 
             // Headers
             Node headers = findChildNodeByTagName(elementProfile, "Headers");
-
-            System.out.println(headers.getTextContent());
 
             if (headers != null) {
                 for(Element elementItem: new NodeListIterator<Element>(headers.getChildNodes())) {

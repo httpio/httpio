@@ -1,23 +1,17 @@
 package com.httpio.app.models;
 
-import com.httpio.app.models.Profile;
-import com.httpio.app.models.Project;
-import com.httpio.app.models.Request;
 import com.httpio.app.modules.Item;
 import com.httpio.app.services.Http;
 import com.httpio.app.services.Http.Methods;
-import com.httpio.app.services.Http.Protocols;
 import org.junit.Test;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.security.NoSuchAlgorithmException;
 
 import static junit.framework.TestCase.assertEquals;
 
 public class ProjectTest {
     @Test
-    public void getChecksum() {
+    public void getChecksum() throws NoSuchAlgorithmException {
         Project project = createProject();
 
         assertEquals("A15E89ED220036C61C857372B021D656", project.getChecksum());

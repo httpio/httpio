@@ -13,7 +13,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -21,7 +20,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.util.HashMap;
 
 public class LayoutController implements ControllerInterface {
 
@@ -33,9 +31,6 @@ public class LayoutController implements ControllerInterface {
 
     @FXML
     private Text statusBar;
-
-    @FXML
-    private VBox content;
 
     @FXML
     private TabPane tabs;
@@ -89,11 +84,6 @@ public class LayoutController implements ControllerInterface {
     @Inject
     public void setApp(App app) {
         this.app = app;
-    }
-
-    public void setContent(Node node) {
-        content.getChildren().clear();
-        content.getChildren().add(node);
     }
 
     public void setView(ProjectView projectView) {

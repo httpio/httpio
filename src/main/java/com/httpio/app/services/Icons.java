@@ -1,6 +1,5 @@
 package com.httpio.app.services;
 
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;

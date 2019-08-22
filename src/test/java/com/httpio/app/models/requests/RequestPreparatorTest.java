@@ -5,7 +5,6 @@ import com.httpio.app.services.Http;
 import com.httpio.app.services.Http.Methods;
 import com.httpio.app.models.Profile;
 import com.httpio.app.modules.Item;
-import com.httpio.app.services.Http.Protocols;
 import com.httpio.app.services.HTTPRequestPreparator;
 import com.httpio.app.services.HTTPRequestPreparator.RequestPrepared;
 import org.junit.Test;

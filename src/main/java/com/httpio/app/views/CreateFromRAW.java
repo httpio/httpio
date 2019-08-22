@@ -12,16 +12,16 @@ import java.io.IOException;
 
 public class CreateFromRAW extends VBox {
     @FXML
-    Text messageField;
+    private Text messageField;
 
     @FXML
-    TextArea textField;
+    private TextArea textField;
 
     @FXML
-    Button createButton;
+    private Button createButton;
 
     @FXML
-    Button cancelButton;
+    private Button cancelButton;
 
     public CreateFromRAW() {
         super();

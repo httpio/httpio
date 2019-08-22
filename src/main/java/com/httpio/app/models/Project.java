@@ -10,12 +10,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
-@SuppressWarnings("unused")
 public class Project {
-
-    /**
-     * Fields
-     */
     private SimpleStringProperty id = new SimpleStringProperty();
     private SimpleStringProperty name = new SimpleStringProperty();
     private SimpleStringProperty description = new SimpleStringProperty();
@@ -30,14 +25,7 @@ public class Project {
      */
     private ObjectProperty<Request> request = new SimpleObjectProperty<>();
 
-    /**
-     * List of profiles.
-     */
     private ListProperty<Profile> profiles = new SimpleListProperty<>(FXCollections.observableArrayList());
-
-    /**
-     * List of requests.
-     */
     private ListProperty<Request> requests = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     /**
@@ -57,6 +45,9 @@ public class Project {
         this.description.setValue(description);
     }
 
+    /**
+     * ID
+     */
     public String getId() {
         return id.getValue();
     }
@@ -65,10 +56,14 @@ public class Project {
         this.id.setValue(id);
     }
 
+    @SuppressWarnings("unused")
     public SimpleStringProperty idProperty() {
         return id;
     }
 
+    /**
+     * Name
+     */
     public String getName() {
         return name.getValue();
     }
@@ -81,6 +76,9 @@ public class Project {
         return name;
     }
 
+    /**
+     * Description
+     */
     public String getDescription() {
         return description.getValue();
     }
@@ -89,31 +87,30 @@ public class Project {
         this.description.setValue(description);
     }
 
+    @SuppressWarnings("unused")
     public SimpleStringProperty descriptionProperty() {
         return description;
     }
 
     /**
-     * Set active profile for profile.
+     * Active profile
      */
     public void setProfile(Profile profile) {
         this.profile.set(profile);
     }
 
-    /**
-     * Get active profile.
-     */
     public Profile getProfile() {
         return profile.get();
     }
 
-    /**
-     * Get active profile property.
-     */
     public ObjectProperty<Profile> profileProperty() {
         return profile;
     }
 
+    /**
+     * Requests
+     */
+    @SuppressWarnings("unused")
     public void setRequests(ObservableList<Request> requests) {
         this.requests.set(requests);
     }
@@ -122,6 +119,7 @@ public class Project {
         return requests.get();
     }
 
+    @SuppressWarnings("unused")
     public ListProperty<Request> requestsProperty() {
         return requests;
     }
@@ -130,6 +128,9 @@ public class Project {
         requests.add(request);
     }
 
+    /**
+     * Profiles
+     */
     public ObservableList<Profile> getProfiles() {
         return profiles.get();
     }
@@ -158,12 +159,15 @@ public class Project {
      * Removed profile can be active. So, there is need to set new
      * active profile for project.
      */
-    public void setProfileAfterRemove() {
+    public void reloadProfileAfterRemove() {
         if (this.profile.getValue() == null) {
             this.profile.setValue(profiles.get(0));
         }
     }
 
+    /**
+     * Active request
+     */
     public void setRequest(Request request) {
         this.request.set(request);
     }
@@ -180,7 +184,7 @@ public class Project {
         }
     }
 
-    public void setRequestAfterRemove() {
+    public void reloadRequestAfterRemove() {
         if (this.request.getValue() == null) {
             this.request.setValue(requests.getValue().get(1));
         }
@@ -190,7 +194,7 @@ public class Project {
         return request;
     }
 
-    public String getChecksum() {
+    public String getChecksum() throws NoSuchAlgorithmException {
         StringBuilder values = new StringBuilder(id.getValue() + name.getValue() + description.getValue());
 
         for(Profile profile: profiles) {
@@ -221,12 +225,7 @@ public class Project {
         values.append(serializeRequests(requests));
 
         // Create checksum
-        MessageDigest md = null;
-        try {
-            md = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        MessageDigest md = MessageDigest.getInstance("MD5");
 
         md.update(values.toString().getBytes());
 
@@ -236,41 +235,42 @@ public class Project {
     }
 
     private String serializeRequests(ObservableList<Request> requests) {
-        String values = "";
+        StringBuilder values = new StringBuilder();
 
         for(Request request: requests) {
-            values += request.getId();
-            values += request.getName();
-            values += request.getUrl();
-            values += request.getBody();
-            values += request.isStandalone();
+            values.append(request.getId());
+            values.append(request.getName());
+            values.append(request.getUrl());
+            values.append(request.getBody());
+            values.append(request.isStandalone());
 
             if (request.getMethod() != null) {
-                values += request.getMethod().getId().toString();
+                values.append(request.getMethod().getId().toString());
             }
 
             if (request.getParent() != null) {
-                values += request.getParent().getId();
+                values.append(request.getParent().getId());
             }
 
             for(Item header: request.getHeaders()) {
-                values += header.getId();
-                values += header.getName();
-                values += header.getValue();
+                values.append(header.getId());
+                values.append(header.getName());
+                values.append(header.getValue());
             }
 
             for(Item parameter: request.getParameters()) {
-                values += parameter.getId();
-                values += parameter.getName();
-                values += parameter.getValue();
+                values.append(parameter.getId());
+                values.append(parameter.getName());
+                values.append(parameter.getValue());
             }
 
-            values += serializeRequests(request.getRequests());
+            values.append(serializeRequests(request.getRequests()));
         }
 
-        return values;
+        return values.toString();
     }
 
+    @SuppressWarnings("unused")
     public void dump() {
         System.out.println("id " + id.getValue());
         System.out.println("name " + name.getValue());

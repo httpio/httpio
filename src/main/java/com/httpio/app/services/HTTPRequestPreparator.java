@@ -3,8 +3,6 @@ package com.httpio.app.services;
 import com.httpio.app.models.Profile;
 import com.httpio.app.models.Request;
 import com.httpio.app.modules.Item;
-import com.httpio.app.services.Http.Protocol;
-import com.httpio.app.services.Http.Protocols;
 import org.apache.commons.text.StringSubstitutor;
 
 import java.net.MalformedURLException;
@@ -29,18 +27,16 @@ public class HTTPRequestPreparator {
 
         StringSubstitutor substitutor = new StringSubstitutor(variables, "{", "}");
 
-        String lineA = "";
-
         if (request.getMethod() != null) {
             prepared.setMethod(request.getMethod().toHTTPHeader());
         }
 
         // Resource
-        String url = profile.getBaseURL();
+        StringBuilder url = new StringBuilder(profile.getBaseURL());
 
         // If url is given, then I change url. Otherwise I set url to "/" according with RFC2616.
         if (request.getURLFull() != null) {
-            url += request.getURLFull();
+            url.append(request.getURLFull());
         }
 
         // Parameters
@@ -55,21 +51,16 @@ public class HTTPRequestPreparator {
         }
 
         if (parameters.size() > 0) {
-            url += "?";
+            url.append("?");
 
             for(Map.Entry<String, String> parameter: parameters.entrySet()) {
-                url += parameter.getKey() + "=" + parameter.getValue() + "&";
+                url.append(parameter.getKey()).append("=").append(parameter.getValue()).append("&");
             }
 
-            url = url.substring(0, url.length() - 1);
+            url = new StringBuilder(url.substring(0, url.length() - 1));
         }
 
-        // URL netURL = new URL(url);
-
-        prepared.setUrl(substitutor.replace(url));
-
-        // Protocol
-        // prepared.setProtocol(profile.getProtocol());
+        prepared.setUrl(substitutor.replace(url.toString()));
 
         // Headers
         HashMap<String, String> headers = new HashMap<>();
@@ -106,7 +97,6 @@ public class HTTPRequestPreparator {
     public static class RequestPrepared {
         String method;
         String url;
-        Protocol protocol;
 
         HashMap<String, String> headers = new HashMap<>();
 
@@ -115,10 +105,12 @@ public class HTTPRequestPreparator {
         /**
          * Method
          */
+        @SuppressWarnings("WeakerAccess")
         public String getMethod() {
             return method;
         }
 
+        @SuppressWarnings("WeakerAccess")
         public void setMethod(String method) {
             this.method = method;
         }
@@ -199,7 +191,8 @@ public class HTTPRequestPreparator {
             }
 
             // Create RAW
-            String raw = "";
+            StringBuilder raw = new StringBuilder();
+
             int index = 0;
             int size = lines.size();
 
@@ -207,13 +200,13 @@ public class HTTPRequestPreparator {
                 index++;
 
                 if (index == size) {
-                    raw += line;
+                    raw.append(line);
                 } else {
-                    raw += line + "\n";
+                    raw.append(line).append("\n");
                 }
             }
 
-            return raw;
+            return raw.toString();
         }
     }
 }

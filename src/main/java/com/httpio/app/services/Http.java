@@ -4,8 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class Http {
-    ObservableList<Method> methods = FXCollections.observableArrayList();
-    ObservableList<Protocol> protocols = FXCollections.observableArrayList();
+    private ObservableList<Method> methods = FXCollections.observableArrayList();
 
     public Http() {
         // Init methods
@@ -18,10 +17,6 @@ public class Http {
         methods.add(new Method(Methods.TRACE, "TRACE"));
         methods.add(new Method(Methods.CONNECT, "CONNECT"));
         methods.add(new Method(Methods.PATCH, "PATCH"));
-
-        // Init protocols
-        protocols.add(new Protocol(Protocols.HTTP, "HTTP"));
-        protocols.add(new Protocol(Protocols.HTTPS, "HTTPS"));
     }
 
     public ObservableList<Method> getMethods() {
@@ -46,61 +41,6 @@ public class Http {
         }
 
         return null;
-    }
-
-    public ObservableList<Protocol> getProtocols() {
-        return protocols;
-    }
-
-    public Protocol getProtocolById(Protocols protocol) {
-        for(Protocol m: protocols) {
-            if (m.getId() == protocol) {
-                return m;
-            }
-        }
-
-        return null;
-    }
-
-    public Protocol getProtocolById(String protocol) {
-        for(Protocol m: protocols) {
-            if (m.getId().toString().equals(protocol)) {
-                return m;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Protocols
-     */
-    public enum Protocols {
-        HTTP,
-        HTTPS
-    }
-
-    public class Protocol {
-        Protocols id;
-        String name;
-
-        public Protocol(Protocols id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-
-        public Protocols getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
     }
 
     /**

@@ -4,11 +4,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.text.Text;
 
 public class Logger {
-    Text statusBar;
+    private Text statusBar;
 
-    int clearTimeout = 0;
-
-    Thread threadCleaner;
+    private int clearTimeout = 0;
 
     public Logger() {
         initCleaner();

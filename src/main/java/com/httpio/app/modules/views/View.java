@@ -12,8 +12,6 @@ import java.io.IOException;
 
 /**
  * Base implementation of View.
- *
- * @param <T>
  */
 public class View<T extends ControllerInterface> {
     Parent view;

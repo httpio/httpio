@@ -1,31 +1,21 @@
 package com.httpio.app.modules;
 
-import com.httpio.app.models.Project;
 import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.ObservableList;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ListenersContainer {
     private final String SCOPE_DEFAULT = "default";
 
-    // HashMap<Property, ChangeListener> registered = new HashMap<>();
-    // HashMap<ReadOnlyProperty, ChangeListener> registeredReadonly = new HashMap<>();
-
-    HashMap<String, HashMap<Property, ChangeListener>> registered = new HashMap<>();
-    HashMap<String, HashMap<ReadOnlyProperty, ChangeListener>> registeredReadonly = new HashMap<>();
+    private HashMap<String, HashMap<Property, ChangeListener>> registered = new HashMap<>();
+    private HashMap<String, HashMap<ReadOnlyProperty, ChangeListener>> registeredReadonly = new HashMap<>();
 
     /**
      * Attach listener to property and save on list.
-     *
-     * @param property
-     * @param changeListener
      */
     public <T> void attach(Property<T> property, ChangeListener<T> changeListener) {
         attach(property, changeListener, SCOPE_DEFAULT);
@@ -43,14 +33,12 @@ public class ListenersContainer {
 
     /**
      * Attach listener to readonly property and save on list.
-     *
-     * @param property
-     * @param changeListener
      */
     public <T> void attach(ReadOnlyProperty<T> property, ChangeListener<T> changeListener) {
         attach(property, changeListener, SCOPE_DEFAULT);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public <T> void attach(ReadOnlyProperty<T> property, ChangeListener<T> changeListener, String scope) {
         property.addListener(changeListener);
 
@@ -61,6 +49,7 @@ public class ListenersContainer {
         registeredReadonly.get(scope).put(property, changeListener);
     }
 
+    @SuppressWarnings("unused")
     public void attachToItemsList(ListProperty<? extends Item> items, ChangeListener changeListener) {
         attachToItemsList(items, changeListener, SCOPE_DEFAULT);
     }
@@ -69,7 +58,6 @@ public class ListenersContainer {
         attach(items, changeListener, scope);
 
         for(Item item: items) {
-            attach(item.idProperty(), changeListener, scope);
             attach(item.valueProperty(), changeListener, scope);
             attach(item.nameProperty(), changeListener, scope);
         }

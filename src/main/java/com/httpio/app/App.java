@@ -20,17 +20,10 @@ import java.io.IOException;
 
 public class App extends Application {
     private ProjectSupervisor projectSupervisor;
-
-    private Project project;
-
     private Stage stage;
-
     private Scene scene;
-
     private Components components;
-
     private Injector injector;
-
     private LayoutView layoutView;
 
     /**
@@ -105,8 +98,8 @@ public class App extends Application {
     public void stop() throws Exception {
         super.stop();
 
-        // Platform.exit();
-        // System.exit(0);
+        Platform.exit();
+        System.exit(0);
     }
 
     private void reloadStageTitle() {
@@ -138,41 +131,4 @@ public class App extends Application {
             e.printStackTrace();
         }
     }
-
-//     public Router getRouter() {
-//         if (router == null) {
-//             router = this.new Router();
-//         }
-//
-//         return router;
-//     }
-
-//    private void setContent(View view) {
-//        layoutView.getController().setContent(view.getView());
-//    }
-
-//     public class Router {
-//         public void route(RouteProfiles route) {
-//             try {
-//                 ProfilesView view = new ProfilesView(injector, route.getProject());
-//                 view.load();
-//
-//                 setContent(view);
-//             } catch (IOException e) {
-//                 e.printStackTrace();
-//             }
-//         }
-//
-//         public void route(RouteProject route) {
-//             try {
-//                 ProjectView projectView = new ProjectView(injector, route.getProject());
-//                 projectView.load();
-//
-//                 setContent(projectView);
-//             } catch (IOException e) {
-//                 e.printStackTrace();
-//             }
-//         }
-//
-//     }
 }

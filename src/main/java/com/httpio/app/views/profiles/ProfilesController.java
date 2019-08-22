@@ -8,7 +8,6 @@ import com.httpio.app.modules.Item;
 import com.httpio.app.modules.ListenersContainer;
 import com.httpio.app.modules.views.TableViewNameValue;
 import com.httpio.app.services.Http;
-import com.httpio.app.services.Http.Protocol;
 import com.httpio.app.services.Icons;
 import com.httpio.app.services.ProjectSupervisor;
 import javafx.event.ActionEvent;
@@ -183,7 +182,7 @@ public class ProfilesController implements ControllerInterface {
 
         if (alert.getResult() == ButtonType.YES) {
             project.removeProfile(profile);
-            project.setProfileAfterRemove();
+            project.reloadProfileAfterRemove();
         }
     }
 

@@ -4,8 +4,6 @@ import com.httpio.app.services.Http.Methods;
 import com.httpio.app.models.Profile;
 import com.httpio.app.models.Request;
 import com.httpio.app.services.HTTPSender.Response;
-import com.httpio.app.services.Http.Protocols;
-import junit.framework.TestCase;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;

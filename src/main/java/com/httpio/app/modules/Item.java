@@ -7,14 +7,17 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class Item implements ItemInterface<Item> {
-    StringProperty id = new SimpleStringProperty();
-    StringProperty name = new SimpleStringProperty();
-    StringProperty value = new SimpleStringProperty();
+    private StringProperty id = new SimpleStringProperty();
+    private StringProperty name = new SimpleStringProperty();
+    private StringProperty value = new SimpleStringProperty();
 
-    ArrayList<Item> children;
+    private ArrayList<Item> children = new ArrayList<>();
 
-    Item parent;
+    private Item parent;
 
+    /**
+     * Constructs
+     */
     public Item() {
         id.setValue(UUID.randomUUID().toString());
     }
@@ -42,10 +45,6 @@ public class Item implements ItemInterface<Item> {
     @Override
     public void setId(String id) {
         this.id.setValue(id);
-    }
-
-    public StringProperty idProperty() {
-        return id;
     }
 
     @Override
