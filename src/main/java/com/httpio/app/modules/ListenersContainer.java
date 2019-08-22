@@ -3,7 +3,11 @@ package com.httpio.app.modules;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +17,55 @@ public class ListenersContainer {
 
     private HashMap<String, HashMap<Property, ChangeListener>> registered = new HashMap<>();
     private HashMap<String, HashMap<ReadOnlyProperty, ChangeListener>> registeredReadonly = new HashMap<>();
+
+    @SuppressWarnings("unused")
+    public <T extends ItemInterface> void attachToItemsList(ListProperty<T> items, ChangeListener changeListener) {
+        attachToItemsList(items, changeListener, SCOPE_DEFAULT);
+    }
+
+    public <T extends ItemInterface> void attachToItemsList(ListProperty<T> items, ChangeListener changeListener, String scope) {
+        // Save at register
+        if (!registered.containsKey(scope)) {
+            registered.put(scope, new HashMap<>());
+        }
+
+        registered.get(scope).put(items, changeListener);
+
+        // Add listener to whole list
+        items.addListener(changeListener);
+
+        for(T item: items) {
+            registered.get(scope).put(item.nameProperty(), changeListener);
+            registered.get(scope).put(item.valueProperty(), changeListener);
+
+            item.nameProperty().addListener(changeListener);
+            item.valueProperty().addListener(changeListener);
+        }
+
+        items.addListener(new ListChangeListener<T>() {
+            @Override
+            public void onChanged(Change<? extends T> c) {
+                c.next();
+
+                if (c.getRemovedSize() > 0) {
+                    for(T item: c.getRemoved()) {
+                        detach(item.nameProperty());
+                        detach(item.valueProperty());
+                    }
+                }
+
+                if (c.getAddedSize() > 0) {
+                    for(T item: c.getAddedSubList()) {
+                        registered.get(scope).put(item.nameProperty(), changeListener);
+                        registered.get(scope).put(item.valueProperty(), changeListener);
+
+                        item.nameProperty().addListener(changeListener);
+                        item.valueProperty().addListener(changeListener);
+                    }
+                }
+            }
+        });
+    }
 
     /**
      * Attach listener to property and save on list.
@@ -49,20 +102,6 @@ public class ListenersContainer {
         registeredReadonly.get(scope).put(property, changeListener);
     }
 
-    @SuppressWarnings("unused")
-    public void attachToItemsList(ListProperty<? extends Item> items, ChangeListener changeListener) {
-        attachToItemsList(items, changeListener, SCOPE_DEFAULT);
-    }
-
-    public void attachToItemsList(ListProperty<? extends Item> items, ChangeListener changeListener, String scope) {
-        attach(items, changeListener, scope);
-
-        for(Item item: items) {
-            attach(item.valueProperty(), changeListener, scope);
-            attach(item.nameProperty(), changeListener, scope);
-        }
-    }
-
     /**
      * Remove all listeners.
      */
@@ -94,6 +133,29 @@ public class ListenersContainer {
         if (registeredReadonly.containsKey(scope)) {
             for(Map.Entry<ReadOnlyProperty, ChangeListener> entry: registeredReadonly.get(scope).entrySet()) {
                 entry.getKey().removeListener(entry.getValue());
+            }
+        }
+    }
+
+    public void detach(Property property) {
+        for(Map.Entry<String, HashMap<Property, ChangeListener>> scope: registered.entrySet()) {
+            for(Map.Entry<Property, ChangeListener> entry: scope.getValue().entrySet()) {
+
+                if (entry.getKey() == property) {
+                    entry.getKey().removeListener(entry.getValue());
+
+                    registered.get(scope.getKey()).remove(entry.getKey());
+                }
+            }
+        }
+
+        for(Map.Entry<String, HashMap<ReadOnlyProperty, ChangeListener>> scope: registeredReadonly.entrySet()) {
+            for(Map.Entry<ReadOnlyProperty, ChangeListener> entry: scope.getValue().entrySet()) {
+                if (entry.getKey() == property) {
+                    entry.getKey().removeListener(entry.getValue());
+
+                    registeredReadonly.get(scope.getKey()).remove(entry.getKey());
+                }
             }
         }
     }
