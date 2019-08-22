@@ -20,3 +20,13 @@
     -fx-padding: 5px 5px 0px 10px;
     -fx-spacing: 5px;
 }
+
+.tree-cell:filled {
+    -fx-border-color: silver;
+    -fx-border-width: 0px 0px 1px 0px;
+    -fx-border-style: dotted;
+}
+
+.tree-cell:selected {
+    -fx-background-color: whitesmoke;
+}

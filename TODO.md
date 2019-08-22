@@ -15,3 +15,4 @@ gdy zawartość jest zakodowana w GZIP
     String body = new String(outStream.toByteArray(), "UTF-8");
 
 
+4. Poprawienie typowania dla ListenersContainera.

@@ -2,6 +2,7 @@ package com.httpio.app;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.httpio.app.modules.Item;
 import com.httpio.app.services.Logger;
 import com.httpio.app.views.layout.LayoutView;
 import com.httpio.app.views.profiles.ProfilesView;
@@ -11,11 +12,17 @@ import com.httpio.app.services.ProjectSupervisor;
 import com.httpio.app.modules.Components;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import javax.rmi.ssl.SslRMIClientSocketFactory;
 import java.io.IOException;
 
 public class App extends Application {
@@ -85,6 +92,8 @@ public class App extends Application {
         scene = new Scene(layoutView.getView(), 1700, 900);
         scene.getStylesheets().add(App.class.getResource("/style.css").toExternalForm());
 
+        // new JMetro(JMetro.Style.LIGHT).applyTheme(root);
+
         // Inject Scene to container
         components.setScene(scene);
 
@@ -98,7 +107,7 @@ public class App extends Application {
     public void stop() throws Exception {
         super.stop();
 
-        Platform.exit();
+        // Platform.exit();
         System.exit(0);
     }
 

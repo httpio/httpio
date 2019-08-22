@@ -327,6 +327,8 @@ public class ProjectController implements ControllerInterface {
             return;
         }
 
+        // requestProfileComboBox.selectionModelProperty().getValue()
+
         listenersContainer.attach(profile.idProperty(), onAnyChange, SCOPE_PROFILE);
         listenersContainer.attach(profile.nameProperty(), onAnyChange, SCOPE_PROFILE);
         listenersContainer.attach(profile.baseURLProperty(), onAnyChange, SCOPE_PROFILE);
@@ -370,18 +372,11 @@ public class ProjectController implements ControllerInterface {
             return;
         }
 
-        // Request method
         requestMethod.valueProperty().bindBidirectional(request.methodProperty());
-
-        // URL
         urlField.textProperty().bindBidirectional(request.urlProperty());
 
-        // Header
         requestHeadersTableView.getTableView().itemsProperty().bindBidirectional(request.headersProperty());
-
-        // Parameters
         requestParametersTableView.getTableView().itemsProperty().bindBidirectional(request.parametersProperty());
-
         requestBodyTextArea.textProperty().bindBidirectional(request.bodyProperty());
 
         // Attached to changes
