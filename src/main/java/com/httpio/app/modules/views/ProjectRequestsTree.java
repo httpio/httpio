@@ -101,9 +101,9 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
 
                                 setGraphic(label);
                             }
-                        }
 
-                        attachContextMenu(this, item);
+                            attachContextMenu(this, item);
+                        }
                     }
                 };
             }
@@ -121,11 +121,13 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
         // Add request
         MenuItem itemAddRequest = new MenuItem("Add request");
         MenuItem itemAddRequestFromRaw = new MenuItem("Add request from RAW");
+        MenuItem itemDuplicate = new MenuItem("Duplicate");
         MenuItem itemRename = new MenuItem("Rename");
         MenuItem itemDelete = new MenuItem("Delete");
 
         icons.attachIcon(itemAddRequest, Icons.ICON_ADD);
         icons.attachIcon(itemAddRequestFromRaw, Icons.ICON_ADD);
+        icons.attachIcon(itemDuplicate, Icons.ICON_COPY);
         icons.attachIcon(itemRename, Icons.ICON_RENAME);
         icons.attachIcon(itemDelete, Icons.ICON_REMOVE);
 
@@ -156,6 +158,13 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
             }
         });
 
+        itemDuplicate.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                handleCopyRequest(cell, item);
+            }
+        });
+
         itemRename.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -175,6 +184,7 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
 
         contextMenu.getItems().add(itemAddRequest);
         contextMenu.getItems().add(itemAddRequestFromRaw);
+        contextMenu.getItems().add(itemDuplicate);
         contextMenu.getItems().add(itemRename);
 
         if (cell.getTreeItem() != getRoot() && project.getRequests().size() > 1) {
@@ -225,6 +235,8 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
 
     /**
      * Reload tree.
+     *
+     * @todo Trzeba przeładoowac drzewa tak aby zachowac informacje o rozwiniętych nodach.
      */
     private void reloadTree() {
         // Root is project
@@ -339,6 +351,31 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
         });
 
         window.showAndWait();
+    }
+
+    private void handleCopyRequest(TreeCell<ItemWrapper> cell, ItemWrapper item) {
+        if (item.isProject()) {
+            return;
+        }
+
+        Request created = item.getRequest().duplicate();
+
+        if (item.getRequest().getParent() != null) {
+            item.getRequest().getParent().addRequest(created);
+        } else {
+            project.addRequest(created);
+        }
+
+        // Add tree item
+        TreeItem<ItemWrapper> treeItem = new TreeItem<>(new ItemWrapper(created));
+
+        cell.getTreeItem().getParent().getChildren().add(treeItem);
+
+        if (project != null) {
+            project.setRequest(created);
+        }
+
+        reloadTree();
     }
 
     private void handleDeleteDialog(TreeItem<ItemWrapper> item) {

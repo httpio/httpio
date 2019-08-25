@@ -2,6 +2,7 @@ package com.httpio.app.views.project;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.httpio.app.modules.views.JsonTreeView;
 import com.httpio.app.services.*;
 import com.httpio.app.services.Http.Method;
 import com.httpio.app.models.Profile;
@@ -118,6 +119,9 @@ public class ProjectController implements ControllerInterface {
     @FXML
     private SplitPane splitPane;
 
+    @FXML
+    private JsonTreeView jsonTreeField;
+
     @Inject
     public void setHttpRequestPreparator(HTTPRequestPreparator httpRequestPreparator) {
         this.httpRequestPreparator = httpRequestPreparator;
@@ -192,8 +196,8 @@ public class ProjectController implements ControllerInterface {
         try {
             Response response = httpSender.send(request, profile);
 
-            responseHeaders.setText(response.getHeadersRaw());
-            responseBody.setText(response.getBody());
+            request.setLastResponse(response);
+
         } catch (Exception e) {
             logger.log(Logger.Levels.ERROR, e.getMessage());
         }
@@ -362,7 +366,7 @@ public class ProjectController implements ControllerInterface {
 
             requestBodyTextArea.textProperty().unbindBidirectional(this.request.bodyProperty());
 
-            listenersContainer.detachAll();
+            listenersContainer.detach(SCOPE_REQUEST);
         }
 
         // Attach new request
@@ -380,18 +384,18 @@ public class ProjectController implements ControllerInterface {
         requestBodyTextArea.textProperty().bindBidirectional(request.bodyProperty());
 
         // Attached to changes
-        listenersContainer.attach(request.methodProperty(), onAnyChange);
-        listenersContainer.attach(request.urlProperty(), onAnyChange);
-        listenersContainer.attach(request.headersProperty(), onAnyChange);
-        listenersContainer.attach(request.parametersProperty(), onAnyChange);
-        listenersContainer.attach(request.bodyProperty(), onAnyChange);
+        listenersContainer.attach(request.methodProperty(), onAnyChange, SCOPE_REQUEST);
+        listenersContainer.attach(request.urlProperty(), onAnyChange, SCOPE_REQUEST);
+        listenersContainer.attach(request.headersProperty(), onAnyChange, SCOPE_REQUEST);
+        listenersContainer.attach(request.parametersProperty(), onAnyChange, SCOPE_REQUEST);
+        listenersContainer.attach(request.bodyProperty(), onAnyChange, SCOPE_REQUEST);
 
-        listenersContainer.attach(request.headersProperty(), onAnyChange);
-        listenersContainer.attach(request.parametersProperty(), onAnyChange);
+        listenersContainer.attach(request.headersProperty(), onAnyChange, SCOPE_REQUEST);
+        listenersContainer.attach(request.parametersProperty(), onAnyChange, SCOPE_REQUEST);
 
         for(Item item: request.getHeaders()) {
-            listenersContainer.attach(item.nameProperty(), onAnyChange);
-            listenersContainer.attach(item.valueProperty(), onAnyChange);
+            listenersContainer.attach(item.nameProperty(), onAnyChange, SCOPE_REQUEST);
+            listenersContainer.attach(item.valueProperty(), onAnyChange, SCOPE_REQUEST);
         }
 
         for(Item item: request.getParameters()) {
@@ -399,7 +403,37 @@ public class ProjectController implements ControllerInterface {
             listenersContainer.attach(item.valueProperty(), onAnyChange);
         }
 
+        // Load last response
+        // request.lastResponseProperty().add
+        listenersContainer.attach(request.lastResponseProperty(), new ChangeListener<Response>() {
+            @Override
+            public void changed(ObservableValue<? extends Response> observable, Response old, Response value) {
+                reloadResponse();
+            }
+        }, SCOPE_REQUEST);
+
+        reloadResponse();
         reloadRaw();
+    }
+
+    private void reloadResponse() {
+        responseHeaders.setText(null);
+        responseBody.setText(null);
+
+        if (request == null) {
+            return;
+        }
+
+        Response lastResponse = request.getLastResponse();
+
+        if (lastResponse == null) {
+            return;
+        }
+
+        responseHeaders.setText(lastResponse.getHeadersRaw());
+        responseBody.setText(lastResponse.getBody());
+
+        jsonTreeField.setInput(lastResponse.getBody());
     }
 
     private void reloadRaw() {

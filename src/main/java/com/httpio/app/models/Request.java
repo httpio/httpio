@@ -1,5 +1,6 @@
 package com.httpio.app.models;
 
+import com.httpio.app.services.HTTPSender.Response;
 import com.httpio.app.services.Http.Method;
 import com.httpio.app.modules.Item;
 import javafx.beans.property.*;
@@ -18,6 +19,8 @@ public class Request {
     private SimpleStringProperty body = new SimpleStringProperty();
     private SimpleBooleanProperty inheritResource = new SimpleBooleanProperty(true);
     private SimpleBooleanProperty standalone = new SimpleBooleanProperty(false);
+
+    private SimpleObjectProperty<Response> lastResponse = new SimpleObjectProperty<>();
 
     private Request parent;
 
@@ -39,6 +42,32 @@ public class Request {
     public Request(String id, String name) {
         this.id.setValue(id);
         this.name.setValue(name);
+    }
+
+    public Request duplicate() {
+        Request duplicated = new Request();
+
+        duplicated.setMethod(method.getValue());
+        duplicated.setUrl(url.getValue());
+        duplicated.setName(name.getValue());
+
+        duplicated.setBody(body.getValue());
+        duplicated.setStandalone(standalone.getValue());
+
+        for(Item item: headers.getValue()) {
+            duplicated.addHeader(item.getName(), item.getValue());
+        }
+
+        for(Item item: parameters.getValue()) {
+            duplicated.addParameter(item.getName(), item.getValue());
+        }
+
+        // Copy requests
+        for(Request request: requests.getValue()) {
+            duplicated.addRequest(request.duplicate());
+        }
+
+        return duplicated;
     }
 
     /**
@@ -419,5 +448,20 @@ public class Request {
 
     public SimpleStringProperty bodyProperty() {
         return body;
+    }
+
+    /**
+     * Last response
+     */
+    public Response getLastResponse() {
+        return lastResponse.get();
+    }
+
+    public SimpleObjectProperty<Response> lastResponseProperty() {
+        return lastResponse;
+    }
+
+    public void setLastResponse(Response lastResponse) {
+        this.lastResponse.set(lastResponse);
     }
 }

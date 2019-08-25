@@ -115,15 +115,24 @@ public class JsonTreeView extends VBox {
             try {
                 JsonElement root = parser.parse(input.getValue());
 
+                treeField.setVisible(true);
+                messageField.setVisible(false);
+
                 treeField.setRoot(createTree(root));
 
                 // ...
             } catch (JsonSyntaxException e) {
-                // ...
+                treeField.setVisible(false);
+                messageField.setVisible(true);
+
+                messageField.setText("I can't decode JSON.");
             }
 
         } else {
-            // ...
+            treeField.setVisible(false);
+            messageField.setVisible(true);
+
+            messageField.setText("No content");
         }
     }
 
@@ -139,7 +148,6 @@ public class JsonTreeView extends VBox {
 
             TreeItem<Value> item = new TreeItem<>(new Value(Type.ARRAY));
 
-            // for (int i = 0, max = Math.min(1, array.size()); i < max; i++) {
             for (int i = 0, max = array.size(); i < max; i++) {
                 TreeItem<Value> child = createTree(array.get(i));
 
@@ -195,7 +203,6 @@ public class JsonTreeView extends VBox {
         private Type(Rectangle2D viewport) {
             this.viewport = viewport;
         }
-
     }
 
     /**

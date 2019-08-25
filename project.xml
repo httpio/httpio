@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Project description="" id="A1" name="Json holder" profileId="P1" requestId="R1">
     <Profiles>
-        <Profile baseURL="" description="" id="P1" name="Development">
+        <Profile baseURL="http://development.api.com" description="" id="P1" name="Development">
             <Variables>
                 <Variable id="P1V1" name="UserID" value="1000"/>
             </Variables>
@@ -12,31 +12,31 @@
                 <Parameter id="P1P1" name="userId" value="{UserID}"/>
             </Parameters>
         </Profile>
-        <Profile baseURL="" description="" id="P2" name="Production">
+        <Profile baseURL="http://prodution.api.com" description="" id="P2" name="Production">
             <Variables/>
             <Headers/>
             <Parameters/>
         </Profile>
-        <Profile baseURL="" description="" id="P3" name="Testing">
+        <Profile baseURL="http://testing.api.com" description="" id="P3" name="Testing">
             <Variables/>
             <Headers/>
             <Parameters/>
         </Profile>
     </Profiles>
     <Requests>
-        <Request body="" id="R1" method="GET" name="Todos" standalone="0" url="">
+        <Request body="" id="R1" method="GET" name="Todos" standalone="0" url="/todos/1">
             <Headers/>
             <Parameters/>
         </Request>
-        <Request body="" id="R2" method="GET" name="Posts" standalone="0" url="">
+        <Request body="" id="R2" method="GET" name="Posts" standalone="0" url="/posts">
             <Headers/>
             <Parameters/>
             <Childs>
-                <Request body="" id="R2R1" method="GET" name="Post 1" standalone="0" url="">
+                <Request body="" id="R2R1" method="GET" name="Post 1" standalone="0" url="/1">
                     <Headers/>
                     <Parameters/>
                     <Childs>
-                        <Request body="" id="R2R1R1" method="GET" name="Comments for post 1" standalone="0" url="">
+                        <Request body="" id="R2R1R1" method="GET" name="Comments for post 1" standalone="0" url="/comments">
                             <Headers/>
                             <Parameters/>
                         </Request>
@@ -44,31 +44,31 @@
                 </Request>
             </Childs>
         </Request>
-        <Request body="" id="R3" method="GET" name="Comments" standalone="0" url="">
+        <Request body="" id="R3" method="GET" name="Comments" standalone="0" url="/comments">
             <Headers/>
             <Parameters>
                 <Parameter id="R3P1" name="postId" value="1"/>
             </Parameters>
         </Request>
-        <Request body="" id="R4" method="GET" name="Post for user 1" standalone="0" url="">
+        <Request body="" id="R4" method="GET" name="Post for user 1" standalone="0" url="/posts">
             <Headers/>
             <Parameters>
                 <Parameter id="R4P1" name="userId" value="1"/>
             </Parameters>
         </Request>
-        <Request body="" id="R5" method="POST" name="Create post" standalone="0" url="">
+        <Request body="" id="R5" method="POST" name="Create post" standalone="0" url="/posts">
             <Headers/>
             <Parameters/>
         </Request>
-        <Request body="" id="R6" method="PUT" name="Update post" standalone="0" url="">
+        <Request body="" id="R6" method="PUT" name="Update post" standalone="0" url="/posts">
             <Headers/>
             <Parameters/>
         </Request>
-        <Request body="" id="R7" method="PATCH" name="Patch post 1" standalone="0" url="">
+        <Request body="" id="R7" method="PATCH" name="Patch post 1" standalone="0" url="/posts/1">
             <Headers/>
             <Parameters/>
         </Request>
-        <Request body="" id="R8" method="DELETE" name="Delete post 1" standalone="0" url="">
+        <Request body="" id="R8" method="DELETE" name="Delete post 1" standalone="0" url="/posts/1">
             <Headers/>
             <Parameters/>
         </Request>

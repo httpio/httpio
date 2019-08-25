@@ -2,7 +2,7 @@ package com.httpio.app;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.httpio.app.modules.Item;
+import com.httpio.app.modules.views.JsonTreeView;
 import com.httpio.app.services.Logger;
 import com.httpio.app.views.layout.LayoutView;
 import com.httpio.app.views.profiles.ProfilesView;
@@ -11,18 +11,11 @@ import com.httpio.app.models.Project;
 import com.httpio.app.services.ProjectSupervisor;
 import com.httpio.app.modules.Components;
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleListProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import javax.rmi.ssl.SslRMIClientSocketFactory;
 import java.io.IOException;
 
 public class App extends Application {
@@ -99,6 +92,9 @@ public class App extends Application {
 
         stage.setScene(this.scene);
         stage.show();
+
+        // JsonTreeView jsonTreeView = new JsonTreeView();
+        // scene.setRoot(jsonTreeView);
 
         initViews();
     }

@@ -14,6 +14,7 @@ public class Icons {
     public static final String ICON_SAVE = "p1/Save.png";
     public static final String ICON_SAVE_AS = "p1/Save as.png";
     public static final String ICON_CLOSE = "p1/Close.png";
+    public static final String ICON_COPY = "p1/Copy.png";
 
     public void attachIcon(MenuItem item, String icon) {
         ImageView iconImage = new ImageView(new Image(getClass().getResourceAsStream("/icons/" + icon)));

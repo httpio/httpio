@@ -4,23 +4,6 @@
     -fx-font-weight: bold;
 }
 
-.httpio-buttons-confirm {
-
-}
-
-.httpio-controls-request-label__method {
-    -fx-font-size: 10px;
-}
-
-.httpio-controls-request-label__resource {
-    -fx-font-size: 10px;
-}
-
-.httpio-controls-request-label__method-resource-wrapper {
-    -fx-padding: 5px 5px 0px 10px;
-    -fx-spacing: 5px;
-}
-
 .tree-cell:filled {
     -fx-border-color: silver;
     -fx-border-width: 0px 0px 1px 0px;
