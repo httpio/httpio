@@ -301,6 +301,11 @@ public class Request {
      */
     public void setRequests(ObservableList<Request> requests) {
         this.requests.setAll(requests);
+
+        // Reload parent for requests
+        for(Request request: this.requests) {
+            request.setParent(this);
+        }
     }
 
     /**
