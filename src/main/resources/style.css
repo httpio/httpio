@@ -4,12 +4,20 @@
     -fx-font-weight: bold;
 }
 
-.tree-cell:filled {
-    -fx-border-color: silver;
-    -fx-border-width: 0px 0px 1px 0px;
-    -fx-border-style: dotted;
-}
-
 .tree-cell:selected {
     -fx-background-color: whitesmoke;
+}
+
+.tree-cell-drop-hint-up {
+    -fx-border-color: #eea82f;
+    -fx-border-width: 2 0 0 0; // top, right, bottom, and left border
+}
+
+.tree-cell-drop-hint-in {
+    -fx-background-color: whitesmoke;
+}
+
+.tree-cell-drop-hint-down {
+    -fx-border-color: #eea82f;
+    -fx-border-width: 0 0 2 0; // top, right, bottom, and left border
 }

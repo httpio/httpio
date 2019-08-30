@@ -9,10 +9,13 @@ import com.httpio.app.services.ProjectSupervisor;
 import com.httpio.app.services.RequestsCreator;
 import com.httpio.app.services.Windows;
 import com.httpio.app.services.Windows.Window;
+import com.httpio.app.util.NodeHelper;
+import com.httpio.app.util.TreeItemHelper;
 import com.httpio.app.views.CreateFromRAW;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -36,6 +39,9 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
     private Icons icons;
     private Windows windows;
     private RequestsCreator requestsCreator;
+
+    // private TreeItem<ItemWrapper> dragged;
+    private TreeItem<ItemWrapper> dragged;
 
     /**
      * Listeners
@@ -98,7 +104,7 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
         setCellFactory(new Callback<TreeView<ItemWrapper>, TreeCell<ItemWrapper>>() {
             @Override
             public TreeCell<ItemWrapper> call(TreeView<ItemWrapper> itemWrapperTreeView) {
-                return new TreeCell<ItemWrapper>() {
+                TreeCell<ItemWrapper> cell = new TreeCell<ItemWrapper>() {
                     Text text = new Text();
                     RequestLabel label = new RequestLabel();
 
@@ -123,6 +129,197 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
                         }
                     }
                 };
+
+                // Implementing drag and drop https://brianyoung.blog/2018/08/23/javafx-treeview-drag-drop/
+                cell.setOnDragDetected(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        if (cell.getTreeItem().getValue() == null) {
+                            event.consume();
+
+                            return;
+                        }
+
+                        dragged = cell.getTreeItem();
+
+                        // Create dragboard
+                        Dragboard dragboard = cell.startDragAndDrop(TransferMode.ANY);
+
+                        // Create content
+                        ClipboardContent content = new ClipboardContent();
+
+                        content.putString("Test");
+
+                        dragboard.setContent(content);
+                        dragboard.setDragView(cell.snapshot(null, null));
+
+                        event.consume();
+                    }
+                });
+
+                cell.setOnDragOver(new EventHandler<DragEvent>() {
+                    @Override
+                    public void handle(DragEvent event) {
+                        // Reasign to target value.
+                        TreeCell<ItemWrapper> target = cell;
+
+                        if (target.getTreeItem() == dragged) {
+                            event.consume();
+
+                            return;
+                        }
+
+                        if (target.getTreeItem().getValue() == null) {
+                            event.consume();
+
+                            return;
+                        }
+
+                        TreeItem<ItemWrapper> targetTreeItem =  target.getTreeItem();
+
+                        // Check if object is not child of dragging element.
+                        TreeItemHelper<ItemWrapper> targetTreeItemHelper = new TreeItemHelper<>(targetTreeItem);
+
+                        if (!targetTreeItemHelper.hasParent(dragged)) {
+                            NodeHelper targetHelper = new NodeHelper(target);
+
+                            int zone = targetHelper.getZoneY(event);
+
+                            targetHelper.removeClass("tree-cell-drop-hint-up");
+                            targetHelper.removeClass("tree-cell-drop-hint-in");
+                            targetHelper.removeClass("tree-cell-drop-hint-down");
+
+                            Boolean accept = false;
+
+                            System.out.println("zone: " + zone);
+
+                            if ((zone == 0 || zone == 2) && targetTreeItem.getParent() != null) {
+                                accept = true;
+
+                                if (zone == 0) {
+                                    targetHelper.addClass("tree-cell-drop-hint-up");
+                                } else if (zone == 2) {
+                                    targetHelper.addClass("tree-cell-drop-hint-down");
+                                }
+                            } else {
+                                accept = true;
+
+                                targetHelper.addClass("tree-cell-drop-hint-in");
+                            }
+
+                            if (accept) {
+                                event.acceptTransferModes(TransferMode.ANY);
+                            }
+
+                            target.getTreeItem().setExpanded(true);
+                        }
+
+                        event.consume();
+                    }
+                });
+
+                // cell.setOnDragEntered(new EventHandler<DragEvent>() {
+                //     @Override
+                //     public void handle(DragEvent event) {
+                //         if (event.getGestureSource() != cell && event.getDragboard().hasString()) {
+
+                //             // cell.setBorder(new Border(new BorderStroke()));
+                //         }
+
+                //         event.consume();
+                //     }
+                // });
+
+                // cell.setOnDragDone(new EventHandler<DragEvent>() {
+                //     @Override
+                //     public void handle(DragEvent event) {
+                //         if (event.getGestureSource() != cell && event.getDragboard().hasString()) {
+                //             System.out.println("drag enterned");
+                //         }
+                //     }
+                // });
+
+                cell.setOnDragDropped(new EventHandler<DragEvent>() {
+                    @Override
+                    public void handle(DragEvent event) {
+                        // Reasign to target value.
+                        TreeCell<ItemWrapper> target = cell;
+
+                        NodeHelper targetHelper = new NodeHelper(target);
+
+                        TreeItem<ItemWrapper> targetTreeItem =  target.getTreeItem();
+                        TreeItem<ItemWrapper> targetTreeItemParent = targetTreeItem.getParent();
+
+                        int zone = targetHelper.getZoneY(event);
+
+                        if ((zone == 0 || zone == 2) && targetTreeItemParent != null) {
+                            if (zone == 0) {
+                                int position = targetTreeItemParent.getChildren().indexOf(targetTreeItem);
+
+                                position--;
+
+                                if (position < 0) {
+                                    position = 0;
+                                }
+
+                                TreeItem<ItemWrapper> n = new TreeItem<>(dragged.getValue());
+
+                                targetTreeItemParent.getChildren().add(position, n);
+
+                                getSelectionModel().select(n);
+
+                                if (dragged.getParent() != null) {
+                                    dragged.getParent().getChildren().remove(dragged);
+                                }
+
+                                reloadTreeItemData();
+                            } else if (zone == 2){
+                                int position = targetTreeItemParent.getChildren().indexOf(targetTreeItem);
+
+                                position++;
+
+                                TreeItem<ItemWrapper> n = new TreeItem<>(dragged.getValue());
+
+                                targetTreeItemParent.getChildren().add(position, n);
+
+                                getSelectionModel().select(n);
+
+                                if (dragged.getParent() != null) {
+                                    dragged.getParent().getChildren().remove(dragged);
+                                }
+
+                                reloadTreeItemData();
+                            }
+                        } else {
+                            // targetTreeItem.getChildren().add(dragged);
+                            TreeItem<ItemWrapper> n = new TreeItem<>(dragged.getValue());
+
+                            targetTreeItem.getChildren().add(n);
+
+                            getSelectionModel().select(n);
+
+                            if (dragged.getParent() != null) {
+                                dragged.getParent().getChildren().remove(dragged);
+                            }
+
+                            reloadTreeItemData();
+                        }
+                    }
+                });
+
+                cell.setOnDragExited(new EventHandler<DragEvent>() {
+                    @Override
+                    public void handle(DragEvent event) {
+                        // Check if object is not child of dragging element.
+                        NodeHelper cellHelper = new NodeHelper(cell);
+
+                        cellHelper.removeClass("tree-cell-drop-hint-up");
+                        cellHelper.removeClass("tree-cell-drop-hint-in");
+                        cellHelper.removeClass("tree-cell-drop-hint-down");
+                    }
+                });
+
+                return cell;
             }
         });
 
@@ -269,6 +466,36 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
 
         // Set root
         setRoot(treeItemRoot);
+    }
+
+    private void reloadTreeItemData() {
+        Project itemProject = getRoot().getValue().getProject();
+
+        ObservableList<Request> requests = FXCollections.observableArrayList();
+
+        for(TreeItem<ItemWrapper> treeItem: getRoot().getChildren()) {
+            Request request = treeItem.getValue().getRequest();
+
+            requests.add(request);
+
+            reloadTreeItemDataForRequest(request, treeItem.getChildren());
+        }
+
+        project.setRequests(requests);
+    }
+
+    private void reloadTreeItemDataForRequest(Request parent, ObservableList<TreeItem<ItemWrapper>> childs) {
+        ObservableList<Request> requests = FXCollections.observableArrayList();
+
+        for(TreeItem<ItemWrapper> treeItem: childs) {
+            Request request = treeItem.getValue().getRequest();
+
+            requests.add(request);
+
+            reloadTreeItemDataForRequest(request, treeItem.getChildren());
+        }
+
+        parent.setRequests(requests);
     }
 
     private void setItemsFor(TreeItem<ItemWrapper> parent, ObservableList<Request> children) {
