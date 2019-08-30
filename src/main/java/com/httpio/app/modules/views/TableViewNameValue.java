@@ -14,6 +14,8 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
@@ -28,6 +30,7 @@ public class TableViewNameValue<T extends ItemInterface> extends VBox implements
     private TableColumn<T, String> columnActions;
 
     private Icons icons;
+    private Boolean userInputParser = true;
 
     /**
      * Factories
@@ -72,19 +75,42 @@ public class TableViewNameValue<T extends ItemInterface> extends VBox implements
         addButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                String v = addTextField.getText();
+                handleAddItem();
+            }
+        });
 
-                if (!v.equals("")) {
-                    if (itemFactory != null) {
-                        tableView.getItems().add(itemFactory.call(v));
-
-                        addTextField.setText("");
-                    }
+        addTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode() == KeyCode.ENTER) {
+                    handleAddItem();
                 }
             }
         });
 
         initializeTableView();
+    }
+
+    private void handleAddItem() {
+        String v = addTextField.getText();
+
+        if (!v.equals("") && itemFactory != null) {
+            T item = itemFactory.call(v);
+
+            if (userInputParser && v.contains(":")) {
+                String[] parts = v.split(":");
+
+                item.setName(parts[0].trim());
+
+                if (parts.length == 2) {
+                    item.setValue(parts[1].trim());
+                }
+            }
+
+            tableView.getItems().add(item);
+
+            addTextField.setText("");
+        }
     }
 
     private void initializeTableView() {
@@ -209,5 +235,16 @@ public class TableViewNameValue<T extends ItemInterface> extends VBox implements
 
     public TableView<T> getTableView() {
         return tableView;
+    }
+
+    /**
+     * Input parser
+     */
+    public Boolean getUserInputParser() {
+        return userInputParser;
+    }
+
+    public void setUserInputParser(Boolean userInputParser) {
+        this.userInputParser = userInputParser;
     }
 }
