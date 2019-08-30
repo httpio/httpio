@@ -3,12 +3,14 @@ package com.httpio.app.models;
 import com.httpio.app.services.Http;
 import org.junit.Test;
 
+import java.security.NoSuchAlgorithmException;
+import java.util.Properties;
+
 import static org.junit.Assert.*;
 
 public class RequestTest {
     @Test
     public void getURLFull() {
-
         Request a = new Request(){{
             setUrl("/offers");
         }};
@@ -55,7 +57,7 @@ public class RequestTest {
     }
 
     @Test
-    public void duplicate() {
+    public void duplicate() throws NoSuchAlgorithmException {
         Http http = new Http();
 
         Request a = new Request(){{
@@ -93,7 +95,46 @@ public class RequestTest {
 
         Request copy = a.duplicate();
 
-        // todo Drobić sprawdzenie
-        // Czy kopia jest równa orginałowi
+        assertEquals(copy.getChecksum(new Properties(){{put("excludeId", "1");}}), a.getChecksum(new Properties(){{put("excludeId", "1");}}));
+    }
+
+    @Test
+    public void getChecksum() throws NoSuchAlgorithmException {
+        Http http = new Http();
+
+        Request a = new Request(){{
+            setName("a");
+            setBody("...");
+            setMethod(http.getMethodById(Http.Methods.GET));
+            setUrl("/offers");
+
+            addHeader("Content-Type", "application/json");
+            addParameter("userId", "10");
+        }};
+
+        Request b = new Request(){{
+            setName("b");
+            setBody("...");
+            setMethod(http.getMethodById(Http.Methods.GET));
+            setUrl("/10");
+
+            addHeader("Content-Type", "application/json");
+            addParameter("userId", "10");
+        }};
+
+        Request c = new Request(){{
+            setName("c");
+            setBody("...");
+            setMethod(http.getMethodById(Http.Methods.GET));
+            setUrl("/comments");
+
+            addHeader("Content-Type", "application/json");
+            addParameter("userId", "10");
+        }};
+
+        a.addRequest(b);
+        b.addRequest(c);
+
+        assertEquals("087AA8685EE3D8552EF769ACDB37C9C6", a.getChecksum(new Properties(){{put("excludeId", "1");}}));
     }
 }

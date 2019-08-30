@@ -7,6 +7,10 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import javax.xml.bind.DatatypeConverter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Properties;
 import java.util.UUID;
 
 public class Request {
@@ -463,5 +467,71 @@ public class Request {
 
     public void setLastResponse(Response lastResponse) {
         this.lastResponse.set(lastResponse);
+    }
+
+    public String getChecksum() throws NoSuchAlgorithmException {
+        return getChecksum(new Properties());
+    }
+
+    public String getChecksum(Properties params) throws NoSuchAlgorithmException {
+        StringBuilder values = new StringBuilder();
+
+        // Optional.ofNullable(gearBox).orElse("")
+        if (!params.containsKey("excludeId")) {
+            values.append(ifnull(id.getValue(), ""));
+        }
+
+        if (method.getValue() != null) {
+            values.append(method.getValue().getId().toString());
+        }
+
+        values.append(ifnull(url.getValue(), ""));
+        values.append(ifnull(name.getValue(), ""));
+        values.append(ifnull(body.getValue(), ""));
+
+        if (standalone.getValue()) {
+            values.append("1");
+        } else {
+            values.append("0");
+        }
+
+        if (parent != null) {
+            if (!params.containsKey("excludeId")) {
+                values.append(parent.getId());
+            }
+
+            // values.append(parent.getChecksum(params));
+        }
+
+        for(Item item: headers.getValue()) {
+            if (!params.containsKey("excludeId")) {
+                values.append(ifnull(item.getId(), ""));
+            }
+
+            values.append(ifnull(item.getName(), ""));
+            values.append(ifnull(item.getValue(), ""));
+        }
+
+        for(Item item: parameters.getValue()) {
+            if (!params.containsKey("excludeId")) {
+                values.append(ifnull(item.getId(), ""));
+            }
+
+            values.append(ifnull(item.getName(), ""));
+            values.append(ifnull(item.getValue(), ""));
+        }
+
+        for(Request request: requests.getValue()) {
+            values.append(request.getChecksum(params));
+        }
+
+        // Create checksum
+        MessageDigest md = MessageDigest.getInstance("MD5");
+
+        md.update(values.toString().getBytes());
+
+        byte[] digest = md.digest();
+
+        return DatatypeConverter.printHexBinary(digest).toUpperCase();
     }
 }
