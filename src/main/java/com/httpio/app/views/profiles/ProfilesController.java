@@ -110,13 +110,6 @@ public class ProfilesController implements ControllerInterface {
                         if (empty) {
                             setGraphic(null);
                         } else {
-                            // label.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                            //     @Override
-                            //     public void handle(MouseEvent mouseEvent) {
-                            //         loadProfile(profile);
-                            //     }
-                            // });
-
                             text.textProperty().bind(profile.nameProperty());
 
                             attachContextMenuToProfileListView(this, profile);

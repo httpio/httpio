@@ -1,7 +1,6 @@
 package com.httpio.app.util;
 
 import javafx.scene.Node;
-import javafx.scene.SubScene;
 import javafx.scene.paint.Color;
 
 import java.util.HashMap;
@@ -16,10 +15,7 @@ public class FX {
     }
 
     public static void setStyle(Node node, String attribute, String value) {
-
         HashMap<String, String> exploded = new HashMap<>();
-
-        System.out.println(node.getStyle());
 
         if (!node.getStyle().equals("")) {
             for(String e: node.getStyle().split(";")) {

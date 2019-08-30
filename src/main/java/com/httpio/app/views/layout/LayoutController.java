@@ -2,7 +2,6 @@ package com.httpio.app.views.layout;
 
 import com.google.inject.Inject;
 import com.httpio.app.App;
-import com.httpio.app.models.Project;
 import com.httpio.app.services.Icons;
 import com.httpio.app.services.ProjectSupervisor;
 import com.httpio.app.modules.ControllerInterface;

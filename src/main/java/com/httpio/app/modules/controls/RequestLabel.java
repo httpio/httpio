@@ -98,7 +98,7 @@ public class RequestLabel extends HBox {
         //     }
 
         //     @Override
-        //     protected String computeValue() {
+        //     protected Functions computeValue() {
         //         Method method = request.getMethod();
 
         //         if (method == null) {
