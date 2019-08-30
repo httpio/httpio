@@ -3,18 +3,14 @@ package com.httpio.app.modules.controls;
 import com.httpio.app.models.Request;
 import com.httpio.app.modules.ListenersContainer;
 import com.httpio.app.services.HTTPSender;
-import com.httpio.app.services.Http;
 import com.httpio.app.services.Http.Method;
-import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 

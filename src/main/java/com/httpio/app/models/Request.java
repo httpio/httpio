@@ -12,6 +12,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 import java.util.UUID;
+import static com.httpio.app.util.Functions.ifnull;
 
 public class Request {
     private SimpleStringProperty id = new SimpleStringProperty();
