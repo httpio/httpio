@@ -13,6 +13,9 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -124,13 +127,19 @@ public class LayoutController implements ControllerInterface {
         MenuItem menuItemFileNew = new MenuItem("New");
         icons.attachIcon(menuItemFileNew, Icons.ICON_NEW_FILE);
 
+        menuItemFileNew.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
+
         // File open
         MenuItem menuItemFileOpen = new MenuItem("Open");
         icons.attachIcon(menuItemFileOpen, Icons.ICON_OPEN);
 
+        menuItemFileOpen.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
+
         // File save
         menuItemFileSave = new MenuItem("Save");
         icons.attachIcon(menuItemFileSave, Icons.ICON_SAVE);
+
+        menuItemFileSave.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
 
         // File save as
         MenuItem menuItemFileSaveAs = new MenuItem("Save as");

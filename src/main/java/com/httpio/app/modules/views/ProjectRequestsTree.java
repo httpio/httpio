@@ -17,6 +17,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.*;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 
@@ -78,6 +80,21 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
     }
 
     private void init() {
+        setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                TreeItem<ItemWrapper> selected = getSelectionModel().getSelectedItem();
+
+                if (selected != null) {
+                    if (event.getCode() == KeyCode.DELETE) {
+                        handleDelete(selected);
+                    } else if (event.getCode() == KeyCode.F2) {
+                        handleRename(selected);
+                    }
+                }
+            }
+        });
+
         setCellFactory(new Callback<TreeView<ItemWrapper>, TreeCell<ItemWrapper>>() {
             @Override
             public TreeCell<ItemWrapper> call(TreeView<ItemWrapper> itemWrapperTreeView) {
@@ -131,6 +148,9 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
         icons.attachIcon(itemRename, Icons.ICON_RENAME);
         icons.attachIcon(itemDelete, Icons.ICON_REMOVE);
 
+        itemRename.setAccelerator(new KeyCodeCombination(KeyCode.F2));
+        // itemDelete.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
+
         itemAddRequest.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -147,7 +167,7 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
 
                 cell.getTreeItem().getChildren().add(treeItem);
 
-                handleRenameDialog(treeItem);
+                handleRename(treeItem);
             }
         });
 
@@ -168,14 +188,14 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
         itemRename.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                handleRenameDialog(cell.getTreeItem());
+                handleRename(cell.getTreeItem());
             }
         });
 
         itemDelete.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                handleDeleteDialog(cell.getTreeItem());
+                handleDelete(cell.getTreeItem());
             }
         });
 
@@ -291,7 +311,7 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
         return found;
     }
 
-    private void handleRenameDialog(TreeItem<ItemWrapper> treeItem) {
+    private void handleRename(TreeItem<ItemWrapper> treeItem) {
         TextInputDialog dialog = new TextInputDialog(treeItem.getValue().getName());
 
         dialog.setTitle("Change name of request");
@@ -378,7 +398,7 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
         reloadTree();
     }
 
-    private void handleDeleteDialog(TreeItem<ItemWrapper> item) {
+    private void handleDelete(TreeItem<ItemWrapper> item) {
         if (item.getValue().isProject()) {
             return;
         }

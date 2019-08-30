@@ -16,6 +16,9 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
@@ -95,6 +98,22 @@ public class ProfilesController implements ControllerInterface {
     }
 
     private void prepareProfilesListView() {
+
+        profilesListView.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                Profile selected = profilesListView.getSelectionModel().getSelectedItem();
+
+                if (selected != null) {
+                    if (event.getCode() == KeyCode.F2) {
+                        handleRename(selected);
+                    } else if (event.getCode() == KeyCode.DELETE) {
+                        handleDelete(selected);
+                    }
+                }
+            }
+        });
+
         profilesListView.setCellFactory(new Callback<ListView<Profile>, ListCell<Profile>>() {
             @Override
             public ListCell<Profile> call(ListView<Profile> profileListView) {
@@ -127,22 +146,26 @@ public class ProfilesController implements ControllerInterface {
         MenuItem itemRename = new MenuItem("Rename");
         icons.attachIcon(itemRename, Icons.ICON_RENAME);
 
+        itemRename.setAccelerator(new KeyCodeCombination(KeyCode.F2));
+
         // Delete
         MenuItem itemDelete = new MenuItem("Delete");
         icons.attachIcon(itemDelete, Icons.ICON_REMOVE);
+
+        // itemDelete.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
 
         // Events
         itemRename.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                showRenameDialog(profile);
+                handleRename(profile);
             }
         });
 
         itemDelete.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                showDeleteDialog(profile);
+                handleDelete(profile);
             }
         });
 
@@ -157,7 +180,7 @@ public class ProfilesController implements ControllerInterface {
         cell.setContextMenu(contextMenu);
     }
 
-    private void showRenameDialog(Profile profile) {
+    private void handleRename(Profile profile) {
         TextInputDialog dialog = new TextInputDialog(profile.getName());
 
         dialog.setTitle("Change name of profile");
@@ -170,7 +193,7 @@ public class ProfilesController implements ControllerInterface {
         profilesListView.refresh();
     }
 
-    private void showDeleteDialog(Profile profile) {
+    private void handleDelete(Profile profile) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Delete " + profile.getName() + " ?", ButtonType.YES, ButtonType.NO, ButtonType.CANCEL);
 
         alert.showAndWait();
