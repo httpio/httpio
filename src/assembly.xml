@@ -1,0 +1,27 @@
+<assembly>
+    <id>Test</id>
+    <formats>
+        <format>tar.gz</format>
+        <format>tar.bz2</format>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>/</outputDirectory>
+            <unpack>false</unpack>
+            <includes>
+                <include>javafx</include>
+            </includes>
+        </dependencySet>
+    </dependencySets>
+    <fileSets>
+        <fileSet>
+            <directory>./</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>README*</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>

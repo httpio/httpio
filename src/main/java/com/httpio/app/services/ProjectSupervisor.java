@@ -7,7 +7,6 @@ import com.httpio.app.models.Request;
 import com.httpio.app.services.Http.Methods;
 import com.httpio.app.modules.Item;
 
-import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.util.*;
 

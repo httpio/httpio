@@ -5,7 +5,6 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
@@ -231,7 +230,13 @@ public class Project {
 
         byte[] digest = md.digest();
 
-        return DatatypeConverter.printHexBinary(digest).toUpperCase();
+        StringBuilder sb = new StringBuilder();
+
+        for (byte b : digest) {
+            sb.append(String.format("%02x", b));
+        }
+
+        return sb.toString().toUpperCase();
     }
 
     private String serializeRequests(ObservableList<Request> requests) {
