@@ -20,9 +20,8 @@ module httpio {
     requires javafx.graphics;
 
     requires gson;
-    requires java.xml;
     requires com.google.guice;
-    requires java.base;
+    requires java.xml;
 
     // requires guice;
     requires org.jetbrains.annotations;
