@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.httpio.app.models.Profile;
 import com.httpio.app.models.Request;
 import com.httpio.app.services.HTTPRequestPreparator.RequestPrepared;
+import javafx.scene.control.skin.TableHeaderRow;
 
 import java.io.*;
 import java.net.*;

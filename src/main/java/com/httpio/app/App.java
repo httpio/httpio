@@ -4,6 +4,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.httpio.app.modules.views.JsonTreeView;
 import com.httpio.app.services.Logger;
+import com.httpio.app.services.TasksSupervisor;
+import com.httpio.app.tasks.ExecuteRequest;
 import com.httpio.app.views.layout.LayoutView;
 import com.httpio.app.views.profiles.ProfilesView;
 import com.httpio.app.views.project.ProjectView;
@@ -11,12 +13,16 @@ import com.httpio.app.models.Project;
 import com.httpio.app.services.ProjectSupervisor;
 import com.httpio.app.modules.Components;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.SortedSet;
 
 public class App extends Application {
     private ProjectSupervisor projectSupervisor;
@@ -79,22 +85,21 @@ public class App extends Application {
 
         // Logger
         Logger logger = injector.getInstance(Logger.class);
-        logger.setStatusBar(layoutView.getController().getStatusBar());
+        // logger.setStatusBar(layoutView.getController().getStatusBar());
         logger.log("Starting Httpio.");
 
         scene = new Scene(layoutView.getView(), 1700, 900);
         scene.getStylesheets().add(App.class.getResource("/style.css").toExternalForm());
 
-        // new JMetro(JMetro.Style.LIGHT).applyTheme(root);
+        // Task supervisor
+        TasksSupervisor tasksSupervisor = injector.getInstance(TasksSupervisor.class);
+        tasksSupervisor.setStatusBar(layoutView.getController().getStatusBar());
 
         // Inject Scene to container
         components.setScene(scene);
 
         stage.setScene(this.scene);
         stage.show();
-
-        // JsonTreeView jsonTreeView = new JsonTreeView();
-        // scene.setRoot(jsonTreeView);
 
         initViews();
     }
@@ -103,8 +108,8 @@ public class App extends Application {
     public void stop() throws Exception {
         super.stop();
 
-        // Platform.exit();
-        System.exit(0);
+        Platform.exit();
+        // System.exit(0);
     }
 
     private void reloadStageTitle() {

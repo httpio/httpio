@@ -1,0 +1,9 @@
+#!/bin/bash
+
+java \
+    --module-path "$JAVA_HOME/lib:./lib" \
+    --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics,gson,com.google.guice,java.xml,org.jetbrains.annotations,org.apache.commons.text,org.controlsfx.controls,java.base \
+    --add-opens java.base/java.lang=com.google.guice \
+    -cp httpio-1.0.0-pre-alpha.jar com.httpio.app.App
+
+

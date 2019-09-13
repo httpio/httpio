@@ -9,10 +9,12 @@ import com.httpio.app.views.profiles.ProfilesView;
 import com.httpio.app.views.project.ProjectView;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.skin.TableHeaderRow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -20,6 +22,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.controlsfx.control.StatusBar;
 
 import java.io.File;
 
@@ -32,7 +35,7 @@ public class LayoutController implements ControllerInterface {
     private MenuBar menuBar;
 
     @FXML
-    private Text statusBar;
+    private StatusBar statusBar;
 
     @FXML
     private TabPane tabs;
@@ -100,13 +103,33 @@ public class LayoutController implements ControllerInterface {
         profilesContent.getChildren().setAll(profilesView.getView());
     }
 
-    public Text getStatusBar() {
-        return statusBar;
-    }
+    // public Text getStatusBar() {
+    //     return statusBar;
+    // }
 
     @Override
     public void prepare() {
         prepareMenuBar();
+
+        Task<Integer> test = new Task<Integer>() {
+            @Override
+            protected Integer call() throws Exception {
+                Thread.sleep(5000);
+                System.out.println("call");
+                return null;
+            }
+
+        };
+
+        // System.out.println("przed");
+
+        // // new Thread(test).start();
+
+        // System.out.println("przed");
+        // statusBar.prog
+        // statusBar.setProgress(0.50);
+        // statusBar.setText("Test");
+        // statusBar.getRightItems().add(new Text("Test"));
 
         // projectSupervisor.projectProperty().addListener(new ChangeListener<Project>() {
         //     @Override
@@ -269,5 +292,9 @@ public class LayoutController implements ControllerInterface {
         } else {
             menuItemFileSave.setDisable(false);
         }
+    }
+
+    public StatusBar getStatusBar() {
+        return statusBar;
     }
 }

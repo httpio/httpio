@@ -1,26 +1,46 @@
 <assembly>
-    <id>Test</id>
+    <id>build</id>
+    <!-- Specifies that our binary distribution is a zip package -->
     <formats>
-        <format>tar.gz</format>
-        <format>tar.bz2</format>
         <format>zip</format>
+        <format>tar.gz</format>
     </formats>
-    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <!-- Adds the dependencies of our application to the lib directory -->
     <dependencySets>
         <dependencySet>
-            <outputDirectory>/</outputDirectory>
+            <!--
+                Project artifact is not copied under library directory since
+                it is added to the root directory of the zip package.
+            -->
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>lib</outputDirectory>
             <unpack>false</unpack>
-            <includes>
-                <include>javafx</include>
-            </includes>
         </dependencySet>
     </dependencySets>
     <fileSets>
+        <!--
+            Adds startup scripts to the root directory of zip package. The startup
+            scripts are copied from the src/main/scripts directory.
+        -->
         <fileSet>
-            <directory>./</directory>
-            <outputDirectory>/</outputDirectory>
+            <!-- <directory>${project.build.scriptSourceDirectory}</directory>-->
+            <directory>src/scripts</directory>
+            <outputDirectory></outputDirectory>
             <includes>
-                <include>README*</include>
+                <!-- <include>startup.*</include> -->
+                <include>*</include>
+            </includes>
+        </fileSet>
+        <!--
+            Adds the jar file of our example application to the root directory
+            of the created zip package.
+        -->
+        <fileSet>
+            <directory>target</directory>
+            <outputDirectory></outputDirectory>
+            <includes>
+                <include>*.jar</include>
             </includes>
         </fileSet>
     </fileSets>

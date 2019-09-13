@@ -32,6 +32,8 @@ public class Components extends AbstractModule {
         bind(Http.class).in(Singleton.class);
         bind(Icons.class).in(Singleton.class);
         bind(Windows.class).in(Singleton.class);
+        bind(ProgressBar.class).in(Singleton.class);
+        bind(TasksSupervisor.class).in(Singleton.class);
     }
 
     @Provides

@@ -12,6 +12,7 @@ import com.httpio.app.modules.*;
 import com.httpio.app.modules.views.ProjectRequestsTree;
 import com.httpio.app.modules.views.TableViewNameValue;
 import com.httpio.app.services.HTTPSender.Response;
+import com.httpio.app.tasks.ExecuteRequest;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -40,6 +41,7 @@ public class ProjectController implements ControllerInterface {
     private ProjectSupervisor projectSupervisor;
     private Windows windows;
     private RequestsCreator requestsCreator;
+    private TasksSupervisor tasksSupervisor;
 
     /**
      * Listeners container
@@ -133,6 +135,11 @@ public class ProjectController implements ControllerInterface {
     }
 
     @Inject
+    public void setTasksSupervisor(TasksSupervisor tasksSupervisor) {
+        this.tasksSupervisor = tasksSupervisor;
+    }
+
+    @Inject
     public void setRequestsCreator(RequestsCreator requestsCreator) {
         this.requestsCreator = requestsCreator;
     }
@@ -193,14 +200,18 @@ public class ProjectController implements ControllerInterface {
     }
 
     private void handleSendAction() {
-        try {
-            Response response = httpSender.send(request, profile);
+        tasksSupervisor.start(new ExecuteRequest(request, profile, httpSender));
 
-            request.setLastResponse(response);
+        // try {
+        //     Response response = httpSender.send(request, profile);
 
-        } catch (Exception e) {
-            logger.log(Logger.Levels.ERROR, e.getMessage());
-        }
+        //     request.setLastResponse(response);
+
+        // } catch (Exception e) {
+        //     logger.log(Logger.Levels.ERROR, e.getMessage());
+        // }
+
+
     }
 
     private void prepareRequestProfileComboBox() {

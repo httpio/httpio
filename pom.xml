@@ -55,13 +55,19 @@
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
-      <version>11.0.2</version>
+      <version>13</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-fxml -->
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-fxml</artifactId>
-      <version>11.0.2</version>
+      <version>13</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.controlsfx/controlsfx -->
+    <dependency>
+      <groupId>org.controlsfx</groupId>
+      <artifactId>controlsfx</artifactId>
+      <version>11.0.0</version>
     </dependency>
   </dependencies>
   <build>
@@ -140,10 +146,10 @@
               <mainClass>com.httpio.app.App</mainClass>
             </manifest>
           </archive>
-          <!--<descriptor>src/assembly.xml</descriptor>-->
-          <descriptorRefs>
+          <descriptor>src/assembly.xml</descriptor>
+          <!--<descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
+          </descriptorRefs>-->
         </configuration>
         <executions>
           <execution>

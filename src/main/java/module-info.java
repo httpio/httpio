@@ -1,4 +1,4 @@
-module httpio {
+module com.httpio {
     opens com.httpio.app to javafx.graphics, com.google.guice, javafx.fxml;
     opens com.httpio.app.views.layout to com.google.guice, javafx.fxml;
     opens com.httpio.app.views.project to javafx.fxml;
@@ -27,7 +27,9 @@ module httpio {
     requires org.jetbrains.annotations;
 
     requires org.apache.commons.text;
+    requires org.controlsfx.controls;
 
+    requires java.base;
     // exports com.httpio.app;
 }
 
