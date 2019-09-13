@@ -15,3 +15,5 @@ The current version 1.0.0-pre-alpha is the development version. The version has 
 - variable management,
 - headline management,
 - parameter management.
+
+[Download 1.0.0-pre-alpha version](https://github.com/httpio/httpio/releases/download/1.0.0-pre-alpha/httpio-1.0.0-pre-alpha.zip)
