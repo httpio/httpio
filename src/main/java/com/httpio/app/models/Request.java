@@ -9,6 +9,8 @@ import javafx.collections.ObservableList;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 import static com.httpio.app.util.Functions.ifnull;
@@ -26,7 +28,8 @@ public class Request {
 
     private SimpleObjectProperty<Response> lastResponse = new SimpleObjectProperty<>();
 
-    private Request parent;
+    // private Request parent;
+    private SimpleObjectProperty<Request> parent = new SimpleObjectProperty<>();
 
     private ListProperty<Item> headers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private ListProperty<Item> parameters = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -97,6 +100,8 @@ public class Request {
     }
 
     public String getURLFull() {
+        Request parent = this.parent.get();
+
         String t = url.getValue() == null ? "" : url.getValue();
         String p = parent == null ? "" : parent.getURLFull();
 
@@ -126,7 +131,7 @@ public class Request {
         this.id.setValue(id);
         this.name.setValue(name);
 
-        this.parent = parent;
+        this.parent.setValue(parent);
     }
 
     public Request(String id, Method method, String resource, String name) {
@@ -141,7 +146,7 @@ public class Request {
         this.id.setValue(id);
         this.resource.setValue(resource);
         this.name.setValue(name);
-        this.parent = parent;
+        this.parent.setValue(parent);
         this.method.setValue(method);
     }
 
@@ -300,13 +305,26 @@ public class Request {
      * @param requests
      */
     public void setRequests(ObservableList<Request> requests) {
-        this.requests.setAll(requests);
-
-        // Reload parent for requests
-        for(Request request: this.requests) {
+        for(Request request: requests) {
             request.setParent(this);
         }
+
+        this.requests.setAll(requests);
     }
+
+    // public void setRequests(List<RequestsStaticNode> requests) {
+    //     this.requests.clear();
+
+    //     for(RequestsStaticNode requestsStaticNode: requests) {
+    //         Request request = requestsStaticNode.getRequest();
+
+    //         request.setParent(this);
+
+    //         this.requests.add(request);
+
+    //         request.setRequests(requestsStaticNode.getChilds());
+    //     }
+    // }
 
     /**
      * Returns requests.
@@ -356,14 +374,19 @@ public class Request {
      * @param parent
      */
     public void setParent(Request parent) {
-        this.parent = parent;
+        this.parent.setValue(parent);
+    }
 
-        // // Set id of parent to for export.
-        // if (parent == null) {
-        //     parentId = null;
-        // } else {
-        //     parentId = parent.getId();
-        // }
+    public void removeRequests() {
+        requests.clear();
+
+        for(Request request: requests) {
+            request.setParent(null);
+        }
+    }
+
+    public SimpleObjectProperty<Request> parentProperty() {
+        return parent;
     }
 
     /**
@@ -372,7 +395,23 @@ public class Request {
      * @return
      */
     public Request getParent() {
-        return parent;
+        return parent.getValue();
+    }
+
+    public List<Request> getRequestsFlatPathToRoot() {
+        ArrayList<Request> path = new ArrayList<>();
+
+        path.add(this);
+
+        Request pointer = getParent();
+
+        while(pointer != null) {
+            path.add(pointer);
+
+            pointer = pointer.getParent();
+        }
+
+        return path;
     }
 
     /**
@@ -502,7 +541,7 @@ public class Request {
 
         if (parent != null) {
             if (!params.containsKey("excludeId")) {
-                values.append(parent.getId());
+                values.append(parent.getValue().getId());
             }
 
             // values.append(parent.getChecksum(params));
@@ -544,5 +583,28 @@ public class Request {
         }
 
         return sb.toString().toUpperCase();
+    }
+
+    public static class RequestsStaticNode {
+        private Request request;
+        private List<RequestsStaticNode> childs = new ArrayList<>();
+
+        public RequestsStaticNode() {}
+
+        public RequestsStaticNode(Request request) {
+            this.request = request;
+        }
+
+        public List<RequestsStaticNode> getChilds() {
+            return childs;
+        }
+
+        public Request getRequest() {
+            return request;
+        }
+
+        public void add(RequestsStaticNode node) {
+            childs.add(node);
+        }
     }
 }

@@ -12,24 +12,36 @@ import com.httpio.app.modules.*;
 import com.httpio.app.modules.views.ProjectRequestsTree;
 import com.httpio.app.modules.views.TableViewNameValue;
 import com.httpio.app.services.HTTPSender.Response;
+import com.httpio.app.services.Windows.Window;
 import com.httpio.app.tasks.ExecuteRequest;
+import com.httpio.app.util.GenericWrapper;
+import com.httpio.app.util.NodeHelper;
+import com.httpio.app.views.profiles.ProfilesView;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
+import org.controlsfx.control.BreadCrumbBar;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Controller for project view.
  */
 public class ProjectController implements ControllerInterface {
-    private final String SCOPE_REQUEST = "request";
-    private final String SCOPE_PROFILE = "profile";
+    private final String SCOPE_PROJECT = "Project";
+    private final String SCOPE_REQUEST = "Request";
+    private final String SCOPE_PROFILE = "Profile";
 
     private Injector injector;
     private Project project;
@@ -37,11 +49,11 @@ public class ProjectController implements ControllerInterface {
     private Profile profile;
     private Http http;
     private Icons icons;
-    private Logger logger;
     private ProjectSupervisor projectSupervisor;
     private Windows windows;
     private RequestsCreator requestsCreator;
     private TasksSupervisor tasksSupervisor;
+    private Callback<TreeItem<GenericWrapper>, Button> breadCrumbBarDefaultCrumbNodeFactory;
 
     /**
      * Listeners container
@@ -65,13 +77,6 @@ public class ProjectController implements ControllerInterface {
         @Override
         public void changed(ObservableValue<?> observableValue, Object o, Object t1) {
             reloadRaw();
-        }
-    };
-
-    private ChangeListener<Request> projectRequestPropertyChange = new ChangeListener<Request>() {
-        @Override
-        public void changed(ObservableValue<? extends Request> observableValue, Request old, Request request) {
-            loadRequest(request);
         }
     };
 
@@ -124,6 +129,12 @@ public class ProjectController implements ControllerInterface {
     @FXML
     private JsonTreeView jsonTreeField;
 
+    @FXML
+    private Button profilesButton;
+
+    @FXML
+    private BreadCrumbBar<GenericWrapper> breadCrumbBar;
+
     @Inject
     public void setHttpRequestPreparator(HTTPRequestPreparator httpRequestPreparator) {
         this.httpRequestPreparator = httpRequestPreparator;
@@ -169,11 +180,6 @@ public class ProjectController implements ControllerInterface {
         this.http = http;
     }
 
-    @Inject
-    public void setLogger(Logger logger) {
-        this.logger = logger;
-    }
-
     public SplitPane getSplitPane() {
         return splitPane;
     }
@@ -197,21 +203,80 @@ public class ProjectController implements ControllerInterface {
         prepareRequestProfileComboBox();
         prepareRequestHeadersTableView();
         prepareRequestParametersTableView();
+
+        prepareProfilesButton();
+        prepareBreadCrumbBar();
     }
 
-    private void handleSendAction() {
-        tasksSupervisor.start(new ExecuteRequest(request, profile, httpSender));
+    private void prepareBreadCrumbBar() {
+        breadCrumbBarDefaultCrumbNodeFactory = breadCrumbBar.getCrumbFactory();
 
-        // try {
-        //     Response response = httpSender.send(request, profile);
+        breadCrumbBar.setCrumbFactory(new Callback<TreeItem<GenericWrapper>, Button>() {
+            @Override
+            public Button call(TreeItem<GenericWrapper> treeItem) {
+                Button button = breadCrumbBarDefaultCrumbNodeFactory.call(treeItem);
+                final GenericWrapper item = treeItem.getValue();
 
-        //     request.setLastResponse(response);
+                (new NodeHelper(button)).addClass("httpio-bread-crum-bar__node");
 
-        // } catch (Exception e) {
-        //     logger.log(Logger.Levels.ERROR, e.getMessage());
-        // }
+                button.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent mouseEvent) {
+                        if (item.isProject()) {
+                            // button.textProperty().bind(item.getProject().nameProperty());
+                        } else if (item.isRequest()) {
+                            projectSupervisor.getProject().setRequest(item.getRequest());
+                        } else {
+                            // TODO Log bledow
+                        }
+                    }
+                });
 
+                if (item.isProject()) {
+                    button.textProperty().bind(item.getProject().nameProperty());
+                } else if (item.isRequest()) {
+                    button.textProperty().bind(item.getRequest().nameProperty());
+                } else {
+                    // TODO Log bledow
+                }
 
+                return button;
+            }
+        });
+
+        breadCrumbBar.selectedCrumbProperty().addListener(new ChangeListener<TreeItem<GenericWrapper>>() {
+            @Override
+            public void changed(ObservableValue<? extends TreeItem<GenericWrapper>> observable, TreeItem<GenericWrapper> previous, TreeItem<GenericWrapper> treeItem) {
+                GenericWrapper item = treeItem.getValue();
+
+                if (item.isProject()) {
+
+                } else if (item.isRequest()) {
+                    projectSupervisor.getProject().setRequest(item.getRequest());
+                }
+            }
+        });
+    }
+
+    private void prepareProfilesButton() {
+        profilesButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                try {
+                    ProfilesView profilesView = new ProfilesView(injector, projectSupervisor.getProject());
+
+                    profilesView.load();
+
+                    Window window = windows.create(profilesView.getView());
+
+                    window.setTitle("Httpio - profiles settings");
+                    window.showAndWait();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private void prepareRequestProfileComboBox() {
@@ -297,6 +362,10 @@ public class ProjectController implements ControllerInterface {
         });
     }
 
+    private void handleSendAction() {
+        tasksSupervisor.start(new ExecuteRequest(request, profile, httpSender));
+    }
+
     /**
      * Set project to display.
      *
@@ -309,7 +378,9 @@ public class ProjectController implements ControllerInterface {
             requestProfileComboBox.itemsProperty().unbind();
 
             this.project.profileProperty().removeListener(projectProfilePropertyChange);
-            this.project.requestProperty().removeListener(projectRequestPropertyChange);
+
+            // Remove all listeners from previous project.
+            listenersContainer.detach(SCOPE_PROJECT);
         }
 
         // Assign new active project
@@ -323,11 +394,40 @@ public class ProjectController implements ControllerInterface {
 
         // Load request tree.
         // requestsRequestsTreeView.setRoot(project.getRequestsRoot());
-        project.requestProperty().addListener(projectRequestPropertyChange);
         project.profileProperty().addListener(projectProfilePropertyChange);
+
+        // Attach project to breadcrumb
+        listenersContainer.attach(project.requestProperty(), new ChangeListener<Request>() {
+            @Override
+            public void changed(ObservableValue<? extends Request> observable, Request previous, Request request) {
+                loadRequest(request);
+            }
+        }, SCOPE_PROJECT);
+
+        attachToChangeRequestsTreeListener(project.getRequests());
 
         loadProfile(project.getProfile());
         loadRequest(project.getRequest());
+    }
+
+    private void attachToChangeRequestsTreeListener(ObservableList<Request> requests) {
+        listenersContainer.attach(requests, new ListChangeListener<Request>() {
+            @Override
+            public void onChanged(Change<? extends Request> change) {
+                reloadBreadCrumbBar();
+            }
+        }, SCOPE_PROJECT);
+
+        for(Request request: requests) {
+            listenersContainer.attach(request.parentProperty(), new ChangeListener<Request>() {
+                @Override
+                public void changed(ObservableValue<? extends Request> observable, Request previous, Request r) {
+                    reloadBreadCrumbBar();
+                }
+            }, SCOPE_PROJECT);
+
+            attachToChangeRequestsTreeListener(request.getRequests());
+        }
     }
 
     private void loadProfile(Profile profile) {
@@ -341,8 +441,6 @@ public class ProjectController implements ControllerInterface {
             // If profile is not defined.
             return;
         }
-
-        // requestProfileComboBox.selectionModelProperty().getValue()
 
         listenersContainer.attach(profile.idProperty(), onAnyChange, SCOPE_PROFILE);
         listenersContainer.attach(profile.nameProperty(), onAnyChange, SCOPE_PROFILE);
@@ -415,7 +513,6 @@ public class ProjectController implements ControllerInterface {
         }
 
         // Load last response
-        // request.lastResponseProperty().add
         listenersContainer.attach(request.lastResponseProperty(), new ChangeListener<Response>() {
             @Override
             public void changed(ObservableValue<? extends Response> observable, Response old, Response value) {
@@ -425,6 +522,7 @@ public class ProjectController implements ControllerInterface {
 
         reloadResponse();
         reloadRaw();
+        reloadBreadCrumbBar();
     }
 
     private void reloadResponse() {
@@ -457,5 +555,32 @@ public class ProjectController implements ControllerInterface {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void reloadBreadCrumbBar() {
+        TreeItem<GenericWrapper> treeItemRoot = new TreeItem<>(new GenericWrapper(project));
+        TreeItem<GenericWrapper> parent = treeItemRoot;
+        TreeItem<GenericWrapper> last = treeItemRoot;
+
+        if (project.getRequest() != null) {
+            List<Request> path = project.getRequest().getRequestsFlatPathToRoot();
+
+            Collections.reverse(path);
+
+            for(Request request: path) {
+                System.out.print(request.getName() + " - ");
+
+                TreeItem<GenericWrapper> treeItem = new TreeItem<>(new GenericWrapper(request));
+
+                last = treeItem;
+
+                parent.getChildren().add(treeItem);
+
+                parent = treeItem;
+            }
+        }
+
+        breadCrumbBar.setSelectedCrumb(last);
+        breadCrumbBar.setAutoNavigationEnabled(false);
     }
 }

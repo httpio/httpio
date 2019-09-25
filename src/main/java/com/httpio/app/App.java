@@ -36,7 +36,6 @@ public class App extends Application {
      * Views
      */
     ProjectView projectView;
-    ProfilesView profilesView;
 
     public static void main(String[] args) {
         launch(args);
@@ -124,7 +123,6 @@ public class App extends Application {
 
     private void loadProject(Project project) {
         projectView.getController().setProject(project);
-        profilesView.getController().setProject(project);
     }
 
     private void initViews() {
@@ -132,11 +130,7 @@ public class App extends Application {
             projectView = new ProjectView(injector, projectSupervisor.getProject());
             projectView.load();
 
-            profilesView = new ProfilesView(injector, projectSupervisor.getProject());
-            profilesView.load();
-
             layoutView.getController().setView(projectView);
-            layoutView.getController().setView(profilesView);
         } catch (IOException e) {
             e.printStackTrace();
         }

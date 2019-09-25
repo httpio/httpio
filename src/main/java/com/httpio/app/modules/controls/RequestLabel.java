@@ -21,7 +21,7 @@ public class RequestLabel extends HBox {
     private Text nameField;
 
     @FXML
-    private Badge methodField;
+    private Text methodField;
 
     @FXML
     private Text urlField;
@@ -113,8 +113,9 @@ public class RequestLabel extends HBox {
             return;
         }
 
+        // methodField.setText("[" + request.getValue().getMethod().getId().toString() + "]");
         methodField.setText(request.getValue().getMethod().getId().toString());
-        methodField.setColor(request.getValue().getMethod().getColor());
+        // methodField.setColor(request.getValue().getMethod().getColor());
     }
 
     private void reloadCode() {

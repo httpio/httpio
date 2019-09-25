@@ -9,6 +9,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +18,8 @@ public class ListenersContainer {
 
     private HashMap<String, HashMap<Property, ChangeListener>> registered = new HashMap<>();
     private HashMap<String, HashMap<ReadOnlyProperty, ChangeListener>> registeredReadonly = new HashMap<>();
+
+    private HashMap<String, HashMap<ObservableList, ArrayList<ListChangeListener>>> registeredListChangeListeners = new HashMap<>();
 
     @SuppressWarnings("unused")
     public <T extends ItemInterface> void attachToItemsList(ListProperty<T> items, ChangeListener changeListener) {
@@ -65,6 +68,22 @@ public class ListenersContainer {
                 }
             }
         });
+    }
+
+    public <T> void attach(ObservableList<T> list, ListChangeListener<T> listChangeListener) {
+        attach(list, listChangeListener, SCOPE_DEFAULT);
+    }
+
+    public <T> void attach(ObservableList<T> list, ListChangeListener<T> listChangeListener, String scope) {
+        if (!registeredListChangeListeners.containsKey(scope)) {
+            registeredListChangeListeners.put(scope, new HashMap<>());
+        }
+
+        if (!registeredListChangeListeners.get(scope).containsKey(list)) {
+            registeredListChangeListeners.get(scope).put(list, new ArrayList<>());
+        }
+
+        registeredListChangeListeners.get(scope).get(list).add(listChangeListener);
     }
 
     /**
@@ -121,6 +140,17 @@ public class ListenersContainer {
         }
 
         registeredReadonly = new HashMap<>();
+
+        // ListChangeListener
+        for(Map.Entry<String, HashMap<ObservableList, ArrayList<ListChangeListener>>> scope: registeredListChangeListeners.entrySet()) {
+            for(Map.Entry<ObservableList, ArrayList<ListChangeListener>> list: scope.getValue().entrySet()) {
+                for(ListChangeListener listChangeListener: list.getValue()) {
+                    list.getKey().removeListener(listChangeListener);
+                }
+            }
+        }
+
+        registeredListChangeListeners = new HashMap<>();
     }
 
     public void detach(String scope) {
@@ -128,12 +158,26 @@ public class ListenersContainer {
             for(Map.Entry<Property, ChangeListener> entry: registered.get(scope).entrySet()) {
                 entry.getKey().removeListener(entry.getValue());
             }
+
+            registered.get(scope).clear();
         }
 
         if (registeredReadonly.containsKey(scope)) {
             for(Map.Entry<ReadOnlyProperty, ChangeListener> entry: registeredReadonly.get(scope).entrySet()) {
                 entry.getKey().removeListener(entry.getValue());
             }
+
+            registeredReadonly.get(scope).clear();
+        }
+
+        if (registeredListChangeListeners.containsKey(scope)) {
+            for(Map.Entry<ObservableList, ArrayList<ListChangeListener>> list: registeredListChangeListeners.get(scope).entrySet()) {
+                for(ListChangeListener listChangeListener: list.getValue()) {
+                    list.getKey().removeListener(listChangeListener);
+                }
+            }
+
+            registeredListChangeListeners.get(scope).clear();
         }
     }
 

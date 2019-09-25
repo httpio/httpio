@@ -1,32 +1,51 @@
 package com.httpio.app.views.layout;
 
 import com.google.inject.Inject;
+import com.google.inject.spi.RequireExactBindingAnnotationsOption;
 import com.httpio.app.App;
+import com.httpio.app.models.Project;
+import com.httpio.app.models.Request;
+import com.httpio.app.modules.ListenersContainer;
 import com.httpio.app.services.Icons;
 import com.httpio.app.services.ProjectSupervisor;
 import com.httpio.app.modules.ControllerInterface;
+import com.httpio.app.util.GenericWrapper;
+import com.httpio.app.util.NodeHelper;
 import com.httpio.app.views.profiles.ProfilesView;
 import com.httpio.app.views.project.ProjectView;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.skin.TableHeaderRow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.*;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Callback;
+import org.controlsfx.control.BreadCrumbBar;
 import org.controlsfx.control.StatusBar;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 public class LayoutController implements ControllerInterface {
+    private final String SCOPE_ACTIVE_PROJECT = "ActiveProject";
 
     /**
      * UI
@@ -35,22 +54,10 @@ public class LayoutController implements ControllerInterface {
     private MenuBar menuBar;
 
     @FXML
+    private VBox contentContainer;
+
+    @FXML
     private StatusBar statusBar;
-
-    @FXML
-    private TabPane tabs;
-
-    @FXML
-    private VBox requestsContent;
-
-    @FXML
-    private VBox profilesContent;
-
-    @FXML
-    private Tab tabRequests;
-
-    @FXML
-    private Tab tabProfiles;
 
     /**
      * Menu items
@@ -61,7 +68,6 @@ public class LayoutController implements ControllerInterface {
      * Views
      */
     ProjectView projectView;
-    ProfilesView profilesView;
 
     /**
      * Fields
@@ -70,6 +76,10 @@ public class LayoutController implements ControllerInterface {
     private App app;
     private ProjectSupervisor projectSupervisor;
     private Icons icons;
+    private ListenersContainer listenersContainer = new ListenersContainer();
+
+    private Project project;
+    private Request request;
 
     @Inject
     public void setProjectSupervisor(ProjectSupervisor projectSupervisor) {
@@ -94,13 +104,7 @@ public class LayoutController implements ControllerInterface {
     public void setView(ProjectView projectView) {
         this.projectView = projectView;
 
-        requestsContent.getChildren().setAll(projectView.getView());
-    }
-
-    public void setView(ProfilesView profilesView) {
-        this.profilesView = profilesView;
-
-        profilesContent.getChildren().setAll(profilesView.getView());
+        contentContainer.getChildren().setAll(projectView.getView());
     }
 
     // public Text getStatusBar() {
@@ -111,33 +115,26 @@ public class LayoutController implements ControllerInterface {
     public void prepare() {
         prepareMenuBar();
 
-        Task<Integer> test = new Task<Integer>() {
+        listenersContainer.attach(projectSupervisor.projectProperty(), new ChangeListener<Project>() {
             @Override
-            protected Integer call() throws Exception {
-                Thread.sleep(5000);
-                System.out.println("call");
-                return null;
+            public void changed(ObservableValue<? extends Project> observableValue, Project previous, Project project) {
+                setProject(project);
             }
+        }, SCOPE_ACTIVE_PROJECT);
 
-        };
+        if (projectSupervisor.getProject() != null) {
+            setProject(projectSupervisor.getProject());
+        }
+    }
 
-        // System.out.println("przed");
+    private void setProject(Project project) {
+        listenersContainer.detach(SCOPE_ACTIVE_PROJECT);
 
-        // // new Thread(test).start();
+        if (project == null) {
+            return;
+        }
 
-        // System.out.println("przed");
-        // statusBar.prog
-        // statusBar.setProgress(0.50);
-        // statusBar.setText("Test");
-        // statusBar.getRightItems().add(new Text("Test"));
-
-        // projectSupervisor.projectProperty().addListener(new ChangeListener<Project>() {
-        //     @Override
-        //     public void changed(ObservableValue<? extends Project> observable, Project old, Project project) {
-        //         profilesView.getController().setProject(project);
-        //         projectView.getController().setProject(project);
-        //     }
-        // });
+        this.project = project;
     }
 
     private void prepareMenuBar() {

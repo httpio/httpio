@@ -3,6 +3,7 @@ package com.httpio.app.modules.views;
 import com.google.inject.Inject;
 import com.httpio.app.models.Project;
 import com.httpio.app.models.Request;
+import com.httpio.app.models.Request.RequestsStaticNode;
 import com.httpio.app.modules.controls.RequestLabel;
 import com.httpio.app.services.Icons;
 import com.httpio.app.services.ProjectSupervisor;
@@ -25,6 +26,8 @@ import javafx.scene.input.*;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.httpio.app.modules.views.ProjectRequestsTree.*;
@@ -40,7 +43,6 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
     private Windows windows;
     private RequestsCreator requestsCreator;
 
-    // private TreeItem<ItemWrapper> dragged;
     private TreeItem<ItemWrapper> dragged;
 
     /**
@@ -190,8 +192,6 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
                             targetHelper.removeClass("tree-cell-drop-hint-down");
 
                             Boolean accept = false;
-
-                            System.out.println("zone: " + zone);
 
                             if ((zone == 0 || zone == 2) && targetTreeItem.getParent() != null) {
                                 accept = true;
@@ -469,33 +469,31 @@ public class ProjectRequestsTree extends TreeView<ItemWrapper> {
     }
 
     private void reloadTreeItemData() {
-        Project itemProject = getRoot().getValue().getProject();
-
-        ObservableList<Request> requests = FXCollections.observableArrayList();
+        RequestsStaticNode requestsStaticNodeParent = new RequestsStaticNode();
 
         for(TreeItem<ItemWrapper> treeItem: getRoot().getChildren()) {
             Request request = treeItem.getValue().getRequest();
 
-            requests.add(request);
+            RequestsStaticNode requestsStaticNode = new RequestsStaticNode(request);
 
-            reloadTreeItemDataForRequest(request, treeItem.getChildren());
+            requestsStaticNodeParent.add(requestsStaticNode);
+
+            reloadTreeItemDataForRequest(requestsStaticNode, treeItem.getChildren());
         }
 
-        project.setRequests(requests);
+        project.setRequestsTreeStructure(requestsStaticNodeParent);
     }
 
-    private void reloadTreeItemDataForRequest(Request parent, ObservableList<TreeItem<ItemWrapper>> childs) {
-        ObservableList<Request> requests = FXCollections.observableArrayList();
-
+    private void reloadTreeItemDataForRequest(RequestsStaticNode parent, List<TreeItem<ItemWrapper>> childs) {
         for(TreeItem<ItemWrapper> treeItem: childs) {
             Request request = treeItem.getValue().getRequest();
 
-            requests.add(request);
+            RequestsStaticNode requestsStaticNode = new RequestsStaticNode(request);
 
-            reloadTreeItemDataForRequest(request, treeItem.getChildren());
+            parent.add(requestsStaticNode);
+
+            reloadTreeItemDataForRequest(requestsStaticNode, treeItem.getChildren());
         }
-
-        parent.setRequests(requests);
     }
 
     private void setItemsFor(TreeItem<ItemWrapper> parent, ObservableList<Request> children) {

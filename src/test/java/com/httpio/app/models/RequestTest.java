@@ -4,6 +4,7 @@ import com.httpio.app.services.Http;
 import org.junit.Test;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
@@ -136,5 +137,33 @@ public class RequestTest {
         b.addRequest(c);
 
         assertEquals("087AA8685EE3D8552EF769ACDB37C9C6", a.getChecksum(new Properties(){{put("excludeId", "1");}}));
+    }
+
+    @Test
+    public void getRequestsFlatPathToRoot() {
+        Request a = new Request(){{
+            setId("1");
+        }};
+
+        Request b = new Request(){{
+            setId("2");
+        }};
+
+        Request c = new Request(){{
+            setId("3");
+        }};
+
+        a.addRequest(b);
+        b.addRequest(c);
+
+        List<Request> list = c.getRequestsFlatPathToRoot();
+
+        String ids = "";
+
+        for(Request request: list) {
+            ids += request.getId();
+        }
+
+        assertEquals("321", ids);
     }
 }

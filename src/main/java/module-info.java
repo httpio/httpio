@@ -6,6 +6,7 @@ module com.httpio {
     opens com.httpio.app.views.profiles to javafx.fxml;
     opens com.httpio.app.modules.controls to javafx.fxml;
     opens com.httpio.app.modules to javafx.base;
+    opens com.httpio.app.views to javafx.fxml;
 
     exports com.httpio.app.services to com.google.guice;
     exports com.httpio.app.modules to com.google.guice;

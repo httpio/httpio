@@ -10,14 +10,15 @@ public class Http {
     public Http() {
         // Init methods
         methods.add(new Method(Methods.GET, "GET"));
-        methods.add(new Method(Methods.HEAD, "HEAD"));
-        methods.add(new Method(Methods.PUT, "PUT"));
         methods.add(new Method(Methods.POST, "POST"));
+        methods.add(new Method(Methods.PUT, "PUT"));
         methods.add(new Method(Methods.DELETE, "DELETE"));
+        methods.add(new Method(Methods.HEAD, "HEAD"));
         methods.add(new Method(Methods.OPTIONS, "OPTIONS"));
-        methods.add(new Method(Methods.TRACE, "TRACE"));
-        methods.add(new Method(Methods.CONNECT, "CONNECT"));
         methods.add(new Method(Methods.PATCH, "PATCH"));
+
+        // methods.add(new Method(Methods.TRACE, "TRACE"));
+        // methods.add(new Method(Methods.CONNECT, "CONNECT"));
     }
 
     public ObservableList<Method> getMethods() {

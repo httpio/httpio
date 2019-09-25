@@ -7,6 +7,8 @@ import javafx.collections.ObservableList;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Project {
@@ -26,6 +28,8 @@ public class Project {
 
     private ListProperty<Profile> profiles = new SimpleListProperty<>(FXCollections.observableArrayList());
     private ListProperty<Request> requests = new SimpleListProperty<>(FXCollections.observableArrayList());
+
+    private boolean reloadRequestsTree = false;
 
     /**
      * Constructors
@@ -111,7 +115,11 @@ public class Project {
      */
     @SuppressWarnings("unused")
     public void setRequests(ObservableList<Request> requests) {
-        this.requests.set(requests);
+        for(Request request: requests) {
+            request.setParent(null);
+        }
+
+        this.requests.setAll(requests);
     }
 
     public ObservableList<Request> getRequests() {
@@ -125,6 +133,18 @@ public class Project {
 
     public void addRequest(Request request) {
         requests.add(request);
+
+        request.setParent(null);
+    }
+
+    public void removeRequest(Request request) {
+        requests.remove(request);
+
+        request.setParent(null);
+
+        if (this.request.getValue() == request) {
+            this.request.setValue(this.requests.getValue().get(0));
+        }
     }
 
     /**
@@ -173,14 +193,6 @@ public class Project {
 
     public Request getRequest() {
         return request.get();
-    }
-
-    public void removeRequest(Request request) {
-        requests.remove(request);
-
-        if (this.request.getValue() == request) {
-            this.request.setValue(this.requests.getValue().get(0));
-        }
     }
 
     public void reloadRequestAfterRemove() {
@@ -342,12 +354,53 @@ public class Project {
 
             // Parameter
             System.out.println(indent + "Parameters");
+
             for(Item item: request.getParameters()) {
                 System.out.println("  " + item.getId() + " - " + item.getName() + " - " + item.getValue());
             }
+
             System.out.println();
 
             dumpRequests(request.getRequests(), indent + " ");
+        }
+    }
+
+    public boolean isReloadRequestsTree() {
+        return reloadRequestsTree;
+    }
+
+    public void setRequestsTreeStructure(Request.RequestsStaticNode root) {
+        reloadRequestsTree = true;
+
+        // Clean all requests.
+        requests.clear();
+
+        for(Request.RequestsStaticNode child: root.getChilds()) {
+            Request request = child.getRequest();
+
+            request.setParent(null);
+
+            requests.add(request);
+
+            // Parse childs requests
+            setRequestsTreeStructureFor(child);
+        }
+
+        reloadRequestsTree = false;
+    }
+
+    private void setRequestsTreeStructureFor(Request.RequestsStaticNode node) {
+        Request parent = node.getRequest();
+
+        for(Request.RequestsStaticNode child: node.getChilds()) {
+            Request request = child.getRequest();
+
+            request.setParent(parent);
+
+            parent.addRequest(request);
+
+            // Parse childs requests
+            setRequestsTreeStructureFor(child);
         }
     }
 }
