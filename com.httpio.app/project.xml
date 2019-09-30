@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Project description="" id="A1" name="Json holder" profileId="P1" requestId="R1">
+    <Profiles>
+        <Profile baseURL="http://development.api.com" description="" id="P1" name="Development">
+            <Variables>
+                <Variable id="P1V1" name="UserID" value="1000"/>
+            </Variables>
+            <Headers>
+                <StandardHeader id="P1H1" name="SESSIONID" value="6a293d65-6825-4f44-8b9c-6a86dde65df2"/>
+            </Headers>
+            <Parameters>
+                <Parameter id="P1P1" name="userId" value="{UserID}"/>
+            </Parameters>
+        </Profile>
+        <Profile baseURL="http://prodution.api.com" description="" id="P2" name="Production">
+            <Variables/>
+            <Headers/>
+            <Parameters/>
+        </Profile>
+        <Profile baseURL="http://testing.api.com" description="" id="P3" name="Testing">
+            <Variables/>
+            <Headers/>
+            <Parameters/>
+        </Profile>
+    </Profiles>
+    <Requests>
+        <StandardRequest body="" id="R1" method="get" name="Todos" standalone="0" url="/todos/1">
+            <Headers/>
+            <Parameters/>
+        </StandardRequest>
+        <StandardRequest body="" id="R2" method="get" name="Posts" standalone="0" url="/posts">
+            <Headers/>
+            <Parameters/>
+            <Childs>
+                <StandardRequest body="" id="R2R1" method="get" name="Post 1" standalone="0" url="/1">
+                    <Headers/>
+                    <Parameters/>
+                    <Childs>
+                        <StandardRequest body="" id="R2R1R1" method="get" name="Comments for post 1" standalone="0" url="/comments">
+                            <Headers/>
+                            <Parameters/>
+                        </StandardRequest>
+                    </Childs>
+                </StandardRequest>
+            </Childs>
+        </StandardRequest>
+        <StandardRequest body="" id="R3" method="get" name="Comments" standalone="0" url="/comments">
+            <Headers/>
+            <Parameters>
+                <Parameter id="R3P1" name="postId" value="1"/>
+            </Parameters>
+        </StandardRequest>
+        <StandardRequest body="" id="R4" method="get" name="Post for user 1" standalone="0" url="/posts">
+            <Headers/>
+            <Parameters>
+                <Parameter id="R4P1" name="userId" value="1"/>
+            </Parameters>
+        </StandardRequest>
+        <StandardRequest body="" id="R5" method="post" name="Create post" standalone="0" url="/posts">
+            <Headers/>
+            <Parameters/>
+        </StandardRequest>
+        <StandardRequest body="" id="R6" method="put" name="Update post" standalone="0" url="/posts">
+            <Headers/>
+            <Parameters/>
+        </StandardRequest>
+        <StandardRequest body="" id="R7" method="patch" name="Patch post 1" standalone="0" url="/posts/1">
+            <Headers/>
+            <Parameters/>
+        </StandardRequest>
+        <StandardRequest body="" id="R8" method="delete" name="Delete post 1" standalone="0" url="/posts/1">
+            <Headers/>
+            <Parameters/>
+        </StandardRequest>
+    </Requests>
+</Project>
