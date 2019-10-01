@@ -31,18 +31,18 @@
     <orderEntry type="library" name="Maven: org.jetbrains:annotations:17.0.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.5" level="project" />
     <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:13" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:linux:13" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:win:13" level="project" />
     <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:13" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:linux:13" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:win:13" level="project" />
     <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:13" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:linux:13" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:win:13" level="project" />
     <orderEntry type="library" name="Maven: org.controlsfx:controlsfx:11.0.0" level="project" />
     <orderEntry type="library" name="Maven: org.openjfx:javafx-base:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:linux:11" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:win:11" level="project" />
     <orderEntry type="library" name="Maven: org.openjfx:javafx-media:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-media:linux:11" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-media:win:11" level="project" />
     <orderEntry type="library" name="Maven: org.openjfx:javafx-web:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-web:linux:11" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-web:win:11" level="project" />
     <orderEntry type="library" name="Maven: com.httpio.http:com-httpio-http:1.0.0-pre-alpha" level="project" />
   </component>
 </module>

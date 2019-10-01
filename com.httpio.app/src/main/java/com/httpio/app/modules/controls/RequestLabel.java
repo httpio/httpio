@@ -136,10 +136,7 @@ public class RequestLabel extends HBox {
 
         codeField.setVisible(true);
 
-        if (lastResponse.isException()) {
-            codeField.setText("EX");
-            codeField.setColor(Color.CRIMSON);
-        } else {
+        if (lastResponse.getCode() != null) {
             int code = lastResponse.getCode().getValueInt();
 
             codeField.setText(String.valueOf(code));
@@ -147,6 +144,11 @@ public class RequestLabel extends HBox {
             if (code >= 200 && code < 300) {
                 codeField.setColor(Color.LIGHTGREEN);
             } else {
+                codeField.setColor(Color.CRIMSON);
+            }
+        } else {
+            if (lastResponse.isException()) {
+                codeField.setText("EX");
                 codeField.setColor(Color.CRIMSON);
             }
         }

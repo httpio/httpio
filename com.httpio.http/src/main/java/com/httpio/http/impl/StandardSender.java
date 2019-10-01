@@ -56,22 +56,48 @@ public class StandardSender implements Sender {
 
         BufferedReader bufferedReader = null;
 
+
+        // Read response code
+        Code code;
+
+        try {
+            code = new StandardCode(connection.getResponseCode());
+
+            response.setCode(code);
+        } catch (IOException e) {
+            response.setException(e);
+        }
+
+        boolean isError = false;
+
+        // Read response content
         try {
             bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charset.forName("UTF-8")));
         } catch (IOException e) {
             response.setException(e);
 
-            return response;
+            isError = true;
         }
 
-        try {
-            while ((line = bufferedReader.readLine()) != null) {
-                stringBuilder.append(line);
-            }
-        } catch (IOException e) {
-            response.setException(e);
+        // There is error. So I read error stream.
+        if (isError) {
+            bufferedReader = new BufferedReader(new InputStreamReader(connection.getErrorStream(), Charset.forName("UTF-8")));
 
-            return response;
+            try {
+                while ((line = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(line);
+                }
+            } catch (IOException e) {
+                response.setException(e);
+            }
+        } else {
+            try {
+                while ((line = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(line);
+                }
+            } catch (IOException e) {
+                response.setException(e);
+            }
         }
 
         // Get headers
@@ -88,17 +114,6 @@ public class StandardSender implements Sender {
             }
         }
 
-        Code code;
-
-        try {
-            code = new StandardCode(connection.getResponseCode());
-        } catch (IOException e) {
-            response.setException(e);
-
-            return response;
-        }
-
-        response.setCode(code);
         response.setBody(new StandardBody(stringBuilder.toString()));
         response.setHeaders(headers);
 
