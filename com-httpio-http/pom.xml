@@ -5,12 +5,15 @@
     <parent>
         <artifactId>com-httpio</artifactId>
         <groupId>com.httpio</groupId>
-        <version>1.0.0-pre-alpha</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.httpio.http</groupId>
+    <name>HTTPio - HTTP</name>
+
     <artifactId>com-httpio-http</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
