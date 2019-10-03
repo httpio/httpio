@@ -2,15 +2,14 @@ package com.httpio.http.impl;
 
 import com.httpio.http.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +27,7 @@ public class StandardSender implements Sender {
             return response;
         }
 
+        // Process URL connection.
         HttpURLConnection connection;
 
         try {
@@ -46,8 +46,43 @@ public class StandardSender implements Sender {
             return response;
         }
 
+        // con.setConnectTimeout(5000);
+        // con.setReadTimeout(5000);
+        // con.setInstanceFollowRedirects(false);
+
+        // HttpUrlConnection.setFollowRedirects(false);
+        // if (status == HttpURLConnection.HTTP_MOVED_TEMP
+        //  || status == HttpURLConnection.HTTP_MOVED_PERM) {
+        //    String location = con.getHeaderField("Location");
+        //    URL newUrl = new URL(location);
+        //    con = (HttpURLConnection) newUrl.openConnection();
+        //}
+
+        // con.setDoOutput(true);
+        // DataOutputStream out = new DataOutputStream(con.getOutputStream());
+        // out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
+        // out.flush();
+        // out.close();
+
         for(Header header: request.getHeaders()) {
             connection.setRequestProperty(header.getName(), header.getValue());
+        }
+
+        if (request.getBody() != null) {
+            String content = request.getBody().getContent();
+
+            if (content != null) {
+                connection.setDoOutput(true);
+
+                try {
+                    connection.getOutputStream().flush();
+                    connection.getOutputStream().write(content.getBytes());
+                    connection.getOutputStream().close();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         // Process response
@@ -56,7 +91,6 @@ public class StandardSender implements Sender {
 
         BufferedReader bufferedReader = null;
 
-
         // Read response code
         Code code;
 
@@ -64,6 +98,7 @@ public class StandardSender implements Sender {
             code = new StandardCode(connection.getResponseCode());
 
             response.setCode(code);
+
         } catch (IOException e) {
             response.setException(e);
         }
